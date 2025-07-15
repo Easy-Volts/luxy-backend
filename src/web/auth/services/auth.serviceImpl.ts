@@ -66,14 +66,10 @@ export class AuthServiceImpl implements AuthService {
 
     const savedUser = await this.userRepository.saveUser(user);
 
-    return apiResponse({
-      success: true,
-      message: 'Account created successfully. OTP sent.',
-      data: {
-        id: savedUser.id,
-        fullName,
-        email: savedUser.email,
-      },
+    return apiResponse(true, 'Account created successfully. OTP sent.', {
+      id: savedUser.id,
+      fullName,
+      email: savedUser.email,
     });
   }
 
@@ -95,14 +91,10 @@ export class AuthServiceImpl implements AuthService {
     await this.userRepository.saveUser(user);
     await this.sendOTPMessage(user.email!, otp);
 
-    return apiResponse({
-      success: true,
-      message: 'OTP resent successfully.',
-      data: {
-        id: user.id,
-        fullName: `${user.firstName} ${user.lastName}`,
-        email: user.email,
-      },
+    return apiResponse(true, 'OTP resent successfully.', {
+      id: user.id,
+      fullName: `${user.firstName} ${user.lastName}`,
+      email: user.email,
     });
   }
 
@@ -132,14 +124,10 @@ export class AuthServiceImpl implements AuthService {
     user.otpCode = undefined;
     user.otpGeneratedAt = undefined;
     await this.userRepository.saveUser(user);
-    return apiResponse({
-      success: true,
-      message: 'OTP verified successfully.',
-      data: {
-        id: user.id,
-        fullName: `${user.firstName} ${user.lastName}`,
-        email: user.email,
-      },
+    return apiResponse(true, 'OTP verified successfully.', {
+      id: user.id,
+      fullName: `${user.firstName} ${user.lastName}`,
+      email: user.email,
     });
   }
 
@@ -165,7 +153,7 @@ export class AuthServiceImpl implements AuthService {
     };
 
     const token = await this.jwtService.signAsync(payload);
-    return apiResponse(mapperUser(user, token));
+    return apiResponse(true, 'Login Successful', mapperUser(user, token));
   }
 
   private generateOTP(email: string): string {

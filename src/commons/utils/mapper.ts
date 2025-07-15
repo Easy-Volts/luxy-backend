@@ -17,9 +17,9 @@ export const mapperUser = (user: Users, token: string) => {
   };
 };
 
-export const apiResponse = (data: any) => {
+export const apiResponse = (status: boolean, message: string, data: any) => {
   return new ApiResponseBuilder<any>()
-    .setMessage('Api Recieved')
+    .setMessage(message)
     .setData(data)
     .build();
 };
