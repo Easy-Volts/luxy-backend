@@ -13,7 +13,7 @@ export class Users {
   @Column()
   lastName?: string;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
   @Index()
   email?: string;
   @Column({ nullable: true })
@@ -49,7 +49,7 @@ export class Users {
   @Column({ type: 'float', nullable: true })
   longitude?: number;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
   phone?: number;
 
   @Column()

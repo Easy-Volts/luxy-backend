@@ -12,7 +12,6 @@ import { CustomLogger } from 'src/log/logs.service';
 import { AUTH_SERVICE } from '../interface/auth.service';
 import { AuthServiceImpl } from '../services/auth.serviceImpl';
 import { RabbitMQService } from 'src/ampq/rabbitMQ';
-import { RabbitMQListenerService } from 'src/ampq/rabbitmq-listener.service';
 import { EmailService } from 'src/email-notification/email.service';
 dotenv.config();
 const secret = process.env.JWT_SECRET ?? 'defaultSecret';
@@ -38,7 +37,6 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
     UserRepository,
     JWTStrategy,
     RabbitMQService,
-    RabbitMQListenerService,
     EmailService,
     AuthGuard,
   ],

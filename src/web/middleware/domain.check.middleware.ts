@@ -10,7 +10,7 @@ export class DomainCheckMiddleware implements NestMiddleware {
     const origin = req.headers.origin || req.headers.host;
 
     this.logger.log(origin || 'Origin');
-    const allowedDomains = ['localhost:8081', 'luxy.com.ng'];
+    const allowedDomains = ['localhost:8088', ''];
 
     const matched = allowedDomains.some((domain) => origin?.includes(domain));
 
