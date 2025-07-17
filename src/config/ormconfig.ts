@@ -15,6 +15,5 @@ export const ormconfig: TypeOrmModule = {
   dropSchema: true,
   logging: true,
 
-
   synchronize: true,
 };
