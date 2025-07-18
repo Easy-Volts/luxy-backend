@@ -33,6 +33,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
       provide: AUTH_SERVICE,
       useClass: AuthServiceImpl,
     },
+
     CustomLogger,
     UserRepository,
     JWTStrategy,

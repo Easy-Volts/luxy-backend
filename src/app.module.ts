@@ -5,6 +5,7 @@ import { LoggerModule } from './log/logger.module';
 import { DomainCheckMiddleware } from './web/middleware/domain.check.middleware';
 import { AuthModule } from './web/auth/module/auth.module';
 import { NotificationModule } from './email-notification/notification.module';
+import { UserModule } from './web/user/module/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NotificationModule } from './email-notification/notification.module';
     LoggerModule,
     AuthModule,
     NotificationModule,
+    UserModule,
   ],
 })
 export class AppModule {
