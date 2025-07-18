@@ -12,9 +12,5 @@ export const ormconfig: TypeOrmModule = {
   password: process.env.DB_PASS ?? '',
   database: process.env.DB_NAME,
   entities: [Users, Customer],
-  dropSchema: true,
-  logging: true,
-
-
   synchronize: true,
 };
