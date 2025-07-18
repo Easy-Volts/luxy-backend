@@ -24,3 +24,4 @@ export class UserController {
     return this.userService.updateUserLocation(id, dto);
   }
 }
+
