@@ -62,7 +62,7 @@ export class AuthServiceImpl implements AuthService {
     user.email = email!;
     user.firstName = firstName;
     user.lastName = lastName ?? '';
-    user.phone = Number(phone);
+    user.phone = phone;
     user.password = hashedPassword;
     user.city = city ?? '';
     user.state = state ?? '';
