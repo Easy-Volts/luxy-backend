@@ -21,6 +21,9 @@ import { LoginDto } from 'src/dtos/user.auth.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { apiResponse, mapperUser } from 'src/commons/utils/mapper';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
+import { Customer } from 'src/domain/entities/customer.model';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -29,6 +32,8 @@ export class AuthServiceImpl implements AuthService {
     private readonly logger: CustomLogger,
     private readonly jwtService: JwtService,
     private readonly rabbitMQ: RabbitMQService,
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
   ) {
     this.logger.setContext(AuthServiceImpl.name);
   }
@@ -65,6 +70,11 @@ export class AuthServiceImpl implements AuthService {
     user.country = country ?? '';
 
     const savedUser = await this.userRepository.saveUser(user);
+
+    // Insert into customer table
+    const customer = new Customer();
+    customer.userId = savedUser.id;
+    await this.customerRepository.save(customer);
 
     return apiResponse(true, 'Account created successfully. OTP sent.', {
       id: savedUser.id,
