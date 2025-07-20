@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Customer } from './customer.model';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Vendor } from './vendor.model';
 
 @Entity({ name: 'car' })
 export class Car {
@@ -67,11 +75,14 @@ export class Car {
   status?: string;
 
   @Column({ type: 'bigint' })
-  customerId!: number;
+  vendorId!: number;
+  @ManyToOne(() => Vendor)
+  @JoinColumn({ name: 'vendorId' })
+  vendor!: Vendor;
 
-  @ManyToOne(() => Customer)
-  @JoinColumn({ name: 'customerId' })
-  customer?: Customer;
+  // You cant mapp car model to customer model
+  // each car belongs to a vendor
+  // we should have another model for car listen base on id
 
   @CreateDateColumn()
   dateCreated?: Date;

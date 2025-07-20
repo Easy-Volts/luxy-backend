@@ -25,4 +25,4 @@ export class CustomerRepository {
   async findOneById(id: number): Promise<Customer | null> {
     return this.customerRepository.findOne({ where: { id } });
   }
-} 
+}

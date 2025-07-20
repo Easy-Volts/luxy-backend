@@ -1,5 +1,6 @@
-import { IsString } from 'class-validator';
+import { IsString, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserType } from 'src/enums/user.enum';
 export class AppRequest {
   @ApiProperty()
   @IsString()
@@ -10,4 +11,7 @@ export class AppRequest {
   @ApiProperty()
   @IsString()
   version?: string;
+  @ApiProperty()
+  @IsEnum(UserType)
+  userType?: UserType;
 }
