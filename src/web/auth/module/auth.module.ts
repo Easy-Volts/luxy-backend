@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/domain/entities/user.model';
 import { Customer } from 'src/domain/entities/customer.model';
 import { UserRepository } from 'src/domain/repository/user.repository';
+import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { AuthGuard } from 'src/commons/security/guard';
 import { JWTStrategy } from 'src/commons/security/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
@@ -36,6 +37,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
 
     CustomLogger,
     UserRepository,
+    CustomerRepository,
     JWTStrategy,
     RabbitMQService,
     EmailService,
