@@ -71,6 +71,17 @@ export class AuthServiceImpl implements AuthService {
 
     const savedUser = await this.userRepository.saveUser(user);
 
+    // Send wallet creation message asynchronously
+    await this.rabbitMQ.sendMessageWallet(
+      {
+        userId: savedUser.id,
+        currency: 'NGN',
+        balance: 0,
+        type: 'WALLET_CREATE',
+      },
+      'wallet-queue',
+    );
+
     // Create customer record after user creation
     const customer = new Customer();
     customer.userId = savedUser.id;
