@@ -1,17 +1,24 @@
-import { IsString, IsEnum } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsEnum, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { UserType } from 'src/enums/user.enum';
 export class AppRequest {
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
+  @IsOptional()
   deviceId?: string;
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   deviceToken?: string;
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
+  @IsOptional()
   version?: string;
-  @ApiProperty()
+  @ApiPropertyOptional({
+    enum: UserType,
+    default: UserType.CUSTOMER,
+  })
+  @IsOptional()
   @IsEnum(UserType)
-  userType?: UserType;
+  userType?: UserType = UserType.CUSTOMER;
 }
