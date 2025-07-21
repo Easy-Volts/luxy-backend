@@ -16,6 +16,8 @@ export class UserServiceImpl implements UserService {
     if (!user) throw new NotFoundException('User not found');
 
     Object.assign(user, dto);
+    user.locationVerified = true;
+    user.lastUpdated = new Date();
 
     await this.userRepository.saveUser(user);
     return apiResponse(true, 'User location updated successfully', dto);

@@ -6,14 +6,16 @@ export const mapperUser = (user: Users, token: string) => {
     id: user.id,
     email: user.email,
     name: user.firstName,
+    phoneNumber: user.phone,
+    token: token,
     status: user.status,
     type: user.userType,
-    phoneNumber: user.phone,
+
     phoneVerified: user.phoneVerified,
     deviceId: user.deviceId,
-    deviceToken: user.deviceToken,
     imageUrl: user.imageUrl,
-    token: token,
+    emailVerified: user.otpVerified,
+    locationVerified: user.locationVerified,
   };
 };
 

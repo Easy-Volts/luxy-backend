@@ -23,7 +23,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
       global: true,
       secret: secret,
       signOptions: {
-        expiresIn: '1h',
+        expiresIn: '24h',
       },
     }),
   ],

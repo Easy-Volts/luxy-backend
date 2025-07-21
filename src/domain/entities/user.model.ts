@@ -75,8 +75,9 @@ export class Users {
 
   @Column({ nullable: true })
   referredBy?: string;
+
   @Column({ default: false })
-  emailVerified?: boolean;
+  locationVerified?: boolean;
 
   @Column({ default: false })
   phoneVerified?: boolean;
