@@ -14,11 +14,13 @@ import { AUTH_SERVICE } from '../interface/auth.service';
 import { AuthServiceImpl } from '../services/auth.serviceImpl';
 import { RabbitMQService } from 'src/ampq/rabbitMQ';
 import { EmailService } from 'src/email-notification/email.service';
+import { Wallet } from 'src/domain/entities/wallet.model';
+import { WalletRepository } from 'src/domain/repository/wallet.repository';
 dotenv.config();
 const secret = process.env.JWT_SECRET ?? 'defaultSecret';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, Customer]),
+    TypeOrmModule.forFeature([Users, Customer, Wallet]),
     JwtModule.register({
       global: true,
       secret: secret,
@@ -42,6 +44,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
     RabbitMQService,
     EmailService,
     AuthGuard,
+    WalletRepository,
   ],
 })
 export class AuthModule {}

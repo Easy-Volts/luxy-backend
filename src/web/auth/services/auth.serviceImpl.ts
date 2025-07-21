@@ -62,7 +62,7 @@ export class AuthServiceImpl implements AuthService {
     user.email = email!;
     user.firstName = firstName;
     user.lastName = lastName ?? '';
-    user.phone = Number(phone);
+    user.phone = phone;
     user.password = hashedPassword;
     user.city = city ?? '';
     user.state = state ?? '';
@@ -70,6 +70,17 @@ export class AuthServiceImpl implements AuthService {
     user.userType = userType ? userType : UserType.CUSTOMER;
 
     const savedUser = await this.userRepository.saveUser(user);
+
+    // Send wallet creation message asynchronously
+    await this.rabbitMQ.sendMessageWallet(
+      {
+        userId: savedUser.id,
+        currency: 'NGN',
+        balance: 0,
+        type: 'WALLET_CREATE',
+      },
+      'wallet-queue',
+    );
 
     // Create customer record after user creation
     const customer = new Customer();
