@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ormconfig } from './config/ormconfig';
 import { LoggerModule } from './log/logger.module';
 import { DomainCheckMiddleware } from './web/middleware/domain.check.middleware';
+import { AuthModule } from './web/auth/module/auth.module';
 import { NotificationModule } from './email-notification/notification.module';
 import { UserModule } from './web/user/module/user.module';
 import { ConfigModule } from '@nestjs/config';
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config';
       useFactory: () => ormconfig,
     }),
     LoggerModule,
+    AuthModule,
     NotificationModule,
     UserModule,
   ],

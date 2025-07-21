@@ -9,10 +9,9 @@ import { UserServiceImpl } from '../services/user.serviceImp';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { AuthGuard } from 'src/commons/security/guard';
 import { CustomLogger } from 'src/log/logs.service';
-import { AuthModule } from 'src/web/auth/module/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), AuthModule],
+  imports: [TypeOrmModule.forFeature([Users])],
   controllers: [UserController],
   providers: [
     {
