@@ -12,7 +12,6 @@ import { AuthService } from '../interface/auth.service';
 import { UserRepository } from 'src/domain/repository/user.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { CustomLogger } from 'src/log/logs.service';
-import { RabbitMQService } from 'src/ampq/rabbitMQ';
 
 import { Users } from 'src/domain/entities/user.model';
 import { Customer } from 'src/domain/entities/customer.model';
@@ -23,6 +22,7 @@ import { LoginDto } from 'src/dtos/user.auth.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { apiResponse, mapperUser } from 'src/commons/utils/mapper';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
+import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -82,7 +82,6 @@ export class AuthServiceImpl implements AuthService {
       'wallet-queue',
     );
 
-    // Create customer record after user creation
     const customer = new Customer();
     customer.userId = savedUser.id;
     customer.kycVerified = false;

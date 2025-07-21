@@ -50,7 +50,9 @@ export class RabbitMQService {
       await connection.close();
     } catch (error: unknown) {
       const err = error as Error;
-      this.logger.warn(`Error sending wallet message to RabbitMQ: ${err.message}`);
+      this.logger.warn(
+        `Error sending wallet message to RabbitMQ: ${err.message}`,
+      );
     }
   }
 }
