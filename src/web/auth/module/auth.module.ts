@@ -14,7 +14,6 @@ import { AUTH_SERVICE } from '../interface/auth.service';
 import { AuthServiceImpl } from '../services/auth.serviceImpl';
 import { Wallet } from 'src/domain/entities/wallet.model';
 import { WalletRepository } from 'src/domain/repository/wallet.repository';
-import { AMPQModule } from 'src/ampq/module/ampq/ampq.module';
 import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 import { ListenerServiceImpl } from 'src/ampq/service/ampq.serviceImpl';
 import { EmailService } from 'src/email-notification/email.service';
@@ -30,7 +29,6 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
         expiresIn: '24h',
       },
     }),
-    AMPQModule,
   ],
   controllers: [AuthController],
 
@@ -48,7 +46,6 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
     WalletRepository,
     JWTStrategy,
     AuthGuard,
-    WalletRepository,
   ],
 })
 export class AuthModule {}
