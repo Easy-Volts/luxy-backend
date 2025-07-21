@@ -10,13 +10,11 @@ import { JwtService } from '@nestjs/jwt';
 
 import { AuthService } from '../interface/auth.service';
 import { UserRepository } from 'src/domain/repository/user.repository';
-import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { CustomLogger } from 'src/log/logs.service';
 import { RabbitMQService } from 'src/ampq/rabbitMQ';
 
 import { Users } from 'src/domain/entities/user.model';
-import { Customer } from 'src/domain/entities/customer.model';
-import { UserStatus, UserType } from 'src/enums/user.enum';
+import { UserStatus } from 'src/enums/user.enum';
 import { CreateAccountDto } from 'src/dtos/user.createdto';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { LoginDto } from 'src/dtos/user.auth.dto';
@@ -28,7 +26,6 @@ import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 export class AuthServiceImpl implements AuthService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly customerRepository: CustomerRepository,
     private readonly logger: CustomLogger,
     private readonly jwtService: JwtService,
     private readonly rabbitMQ: RabbitMQService,
@@ -45,7 +42,6 @@ export class AuthServiceImpl implements AuthService {
       city = '',
       state = '',
       country = '',
-      userType = '',
     } = dto;
 
     this.logger.log(`Creating account for email: ${email}`);
@@ -62,23 +58,13 @@ export class AuthServiceImpl implements AuthService {
     user.email = email!;
     user.firstName = firstName;
     user.lastName = lastName ?? '';
-    user.phone = Number(phone);
+    user.phone = phone;
     user.password = hashedPassword;
     user.city = city ?? '';
     user.state = state ?? '';
     user.country = country ?? '';
-    user.userType = userType ? userType : UserType.CUSTOMER;
 
     const savedUser = await this.userRepository.saveUser(user);
-
-    // Create customer record after user creation
-    const customer = new Customer();
-    customer.userId = savedUser.id;
-    customer.kycVerified = false;
-
-    await this.customerRepository.saveCustomer(customer);
-
-    this.logger.log(`Customer record created for user ID: ${savedUser.id}`);
 
     return apiResponse(true, 'Account created successfully. OTP sent.', {
       id: savedUser.id,
