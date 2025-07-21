@@ -1,27 +1,20 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from 'src/web/auth/controllers/auth.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Users } from 'src/domain/entities/user.model';
-import { Customer } from 'src/domain/entities/customer.model';
-import { UserRepository } from 'src/domain/repository/user.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { AuthGuard } from 'src/commons/security/guard';
 import { JWTStrategy } from 'src/commons/security/jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
-import { CustomLogger } from 'src/log/logs.service';
 import { AUTH_SERVICE } from '../interface/auth.service';
 import { AuthServiceImpl } from '../services/auth.serviceImpl';
-import { Wallet } from 'src/domain/entities/wallet.model';
 import { WalletRepository } from 'src/domain/repository/wallet.repository';
 import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 import { ListenerServiceImpl } from 'src/ampq/service/ampq.serviceImpl';
-import { EmailService } from 'src/email-notification/email.service';
+import { SharedModule } from 'src/shared/shared.module';
 dotenv.config();
 const secret = process.env.JWT_SECRET ?? 'defaultSecret';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, Customer, Wallet]),
     JwtModule.register({
       global: true,
       secret: secret,
@@ -29,6 +22,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
         expiresIn: '24h',
       },
     }),
+    SharedModule,
   ],
   controllers: [AuthController],
 
@@ -39,10 +33,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
     },
     ListenerServiceImpl,
     RabbitMQService,
-    CustomLogger,
-    UserRepository,
     CustomerRepository,
-    EmailService,
     WalletRepository,
     JWTStrategy,
     AuthGuard,

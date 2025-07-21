@@ -30,11 +30,29 @@ export class EmailService {
     channel: Channel,
     msg: Message,
   ) {
+    this.logger.log(`Email Proccessing: ${msg.content.toString()}`);
+
     const htmlBody = `
-      <h2>Email Verification - Luxy</h2>
-      <p>Your OTP code is: <strong>${otp}</strong></p>
-      <p>This code will expire in 5 minutes.</p>
-    `;
+  <div style="max-width: 600px; margin: auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4faff; border: 1px solid #d0e7ff; border-radius: 10px;">
+    <div style="text-align: center;">
+      <img src="https://easyvolts.ng/img/logo-light.png" alt="Luxy Verification" style="width: 50%; max-width: 250px; border-radius: 8px;" />
+    </div>
+    <h2 style="color: #007BFF; text-align: center;">Luxy App</h2>
+    <p style="font-size: 16px; color: #333; text-align: center;">
+      Please use the OTP code below to verify your email address.
+    </p>
+    <div style="text-align: center; margin: 30px 0;">
+      <span style="font-size: 28px; font-weight: bold; color: #004085;">${otp}</span>
+    </div>
+    <p style="font-size: 14px; color: #666; text-align: center;">
+      This code will expire in <strong>5 minutes</strong>. If you did not request this, please ignore this email.
+    </p>
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #d6eaff;" />
+    <p style="font-size: 12px; color: #999; text-align: center;">
+      &copy; ${new Date().getFullYear()} Luxy. All rights reserved.
+    </p>
+  </div>
+`;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
