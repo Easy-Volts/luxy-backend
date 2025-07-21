@@ -1,30 +1,44 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AppRequest } from './app.request';
+
 export class CreateAccountDto extends AppRequest {
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   location?: string;
-  @ApiProperty()
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   state?: string;
-  @ApiProperty()
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   phone?: string;
+
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   fullName?: string;
-  @ApiProperty()
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   city?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  @ApiProperty()
   country?: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Email must be a valid email address' })
   email?: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

@@ -5,7 +5,7 @@ import { CreateAccountDto } from 'src/dtos/user.createdto';
 import { AUTH_SERVICE, AuthService } from '../interface/auth.service';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('api/v1/auth')
@@ -17,35 +17,32 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Resend OTP successfully' })
-  @ApiParam(ResendOTPDto)
+  @ApiBody({ type: ResendOTPDto })
   @ApiResponse({
     status: 200,
     description: 'Resend OTP successfully',
-    type: ResendOTPDto,
   })
   @Post('resend-otp')
   async resendOTP(@Body() data: ResendOTPDto): Promise<ApiResponses<any>> {
     return this.authService.resendOTP(data);
   }
 
-  @ApiOperation({ summary: 'VerifyOTPDto successfully' })
-  @ApiParam(VerifyOTPDto)
+  @ApiOperation({ summary: 'Verify OTP successfully' })
+  @ApiBody({ type: VerifyOTPDto })
   @ApiResponse({
     status: 200,
-    description: 'VerifyOTPDto successfully',
-    type: VerifyOTPDto,
+    description: 'OTP verified successfully',
   })
   @Post('verify-otp')
   async verifyOTP(@Body() data: VerifyOTPDto): Promise<ApiResponses<any>> {
     return this.authService.verifyOTP(data);
   }
 
-  @ApiOperation({ summary: 'CreateAccount successfully' })
-  @ApiParam(CreateAccountDto)
+  @ApiOperation({ summary: 'Create Account successfully' })
+  @ApiBody({ type: CreateAccountDto })
   @ApiResponse({
     status: 200,
-    description: 'CreateAccount successfully',
-    type: CreateAccountDto,
+    description: 'Account created successfully',
   })
   @Post('create-account')
   async createAccount(
@@ -55,11 +52,10 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Login successfully' })
-  @ApiParam(LoginDto)
+  @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
-    description: 'Login successfully',
-    type: LoginDto,
+    description: 'Login successful',
   })
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<ApiResponses<any>> {
