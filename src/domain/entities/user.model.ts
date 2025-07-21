@@ -50,7 +50,7 @@ export class Users {
   longitude?: number;
 
   @Column({ nullable: true })
-  phone?: number;
+  phone?: string;
 
   @Column()
   password?: string;
