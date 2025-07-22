@@ -1,5 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Car } from './car.model';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'brand' })
 export class Brand {
@@ -9,6 +14,9 @@ export class Brand {
   @Column({ type: 'varchar', length: 100, unique: true })
   name!: string;
 
-  @OneToMany(() => Car, (car: any) => car.brand) 
-  cars?: Car[];
+  @CreateDateColumn()
+  dateCreated?: Date;
+
+  @UpdateDateColumn()
+  lastUpdated?: Date;
 }
