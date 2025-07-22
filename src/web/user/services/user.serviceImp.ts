@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../../../domain/repository/user.repository';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
 import { UserService } from '../interface/user.service';
-import { ApiResponses } from 'src/dtos/response';
-import { apiResponse } from 'src/commons/utils/mapper';
+import { ApiResponses, ApiResponseBuilder } from 'src/dtos/response';
+
 @Injectable()
 export class UserServiceImpl implements UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -20,6 +20,10 @@ export class UserServiceImpl implements UserService {
     user.lastUpdated = new Date();
 
     await this.userRepository.saveUser(user);
-    return apiResponse(true, 'User location updated successfully', dto);
+
+    return new ApiResponseBuilder()
+      .setMessage('User location updated successfully')
+      .setData(dto)
+      .build();
   }
 }
