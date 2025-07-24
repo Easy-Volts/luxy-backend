@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Vendor } from './vendor.model';
+import { Brand } from './brand.model';
 
 @Entity({ name: 'car' })
 export class Car {
@@ -79,6 +80,13 @@ export class Car {
   @ManyToOne(() => Vendor)
   @JoinColumn({ name: 'vendorId' })
   vendor!: Vendor;
+
+  @Column({ type: 'bigint' })
+  brandId!: number;
+
+  @ManyToOne(() => Brand, { eager: true })
+  @JoinColumn({ name: 'brandId' })
+  brand!: Brand;
 
   @CreateDateColumn()
   dateCreated?: Date;

@@ -13,6 +13,8 @@ export class Brand {
 
   @Column({ type: 'varchar', length: 100, unique: true })
   name!: string;
+  @Column({ type: 'varchar' })
+  image!: string;
 
   @CreateDateColumn()
   dateCreated?: Date;
