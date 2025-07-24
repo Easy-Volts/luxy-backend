@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'wallet' })
 export class Wallet {
@@ -17,9 +23,12 @@ export class Wallet {
   @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
   status!: string;
 
+  @Column({ type: 'bigint' })
+  accountNumber?: number;
+
   @CreateDateColumn()
   createdAt?: Date;
 
   @UpdateDateColumn()
   updatedAt?: Date;
-} 
+}

@@ -21,4 +21,7 @@ export class WalletRepository {
   async findById(id: number): Promise<Wallet | null> {
     return this.walletRepository.findOne({ where: { id } });
   }
-} 
+  async findByWalletAccount(accountNumber: number): Promise<Wallet | null> {
+    return this.walletRepository.findOne({ where: { accountNumber } });
+  }
+}

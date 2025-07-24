@@ -101,6 +101,25 @@ export class ListenerServiceImpl {
                 wallet.currency = payload.currency;
                 wallet.balance = payload.balance;
                 wallet.status = 'ACTIVE';
+                // generate wallet
+
+                let accountNumber: number = 0;
+                let isUnique = false;
+
+                while (!isUnique) {
+                  accountNumber = Math.floor(
+                    1000000000 + Math.random() * 9000000000,
+                  ); // 10-digit number
+                  const existingWallet =
+                    await this.walletRepository.findByWalletAccount(
+                      accountNumber,
+                    );
+                  if (!existingWallet) {
+                    isUnique = true;
+                  }
+                }
+
+                wallet.accountNumber = accountNumber;
 
                 await this.walletRepository.saveWallet(wallet);
                 this.logger.log(

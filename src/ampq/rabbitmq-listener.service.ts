@@ -26,7 +26,10 @@ export class RabbitMQListenerService implements OnModuleInit {
       // OTP queue consumer
       await this.listenerService.listenOTP(channel, this.queueName);
       // Wallet queue consumer
-      await this.listenerService.listenWalletCreation(channel, this.queueName);
+      await this.listenerService.listenWalletCreation(
+        channel,
+        this.walletQueueName,
+      );
     } catch (error) {
       const err = error as Error;
       this.logger.fatal(`RabbitMQ listener failed to start: ${err.message}`);

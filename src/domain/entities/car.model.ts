@@ -80,10 +80,6 @@ export class Car {
   @JoinColumn({ name: 'vendorId' })
   vendor!: Vendor;
 
-  // You cant mapp car model to customer model
-  // each car belongs to a vendor
-  // we should have another model for car listen base on id
-
   @CreateDateColumn()
   dateCreated?: Date;
 
