@@ -19,8 +19,8 @@ import { UserStatus, UserType } from 'src/enums/user.enum';
 import { CreateAccountDto } from 'src/dtos/user.createdto';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { LoginDto } from 'src/dtos/user.auth.dto';
-import { ApiResponses } from 'src/dtos/response';
-import { apiResponse, mapperUser } from 'src/commons/utils/mapper';
+import { ApiResponses, ApiResponseBuilder } from 'src/dtos/response';
+import { mapperUser } from 'src/commons/utils/mapper';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 
@@ -90,11 +90,14 @@ export class AuthServiceImpl implements AuthService {
 
     this.logger.log(`Customer record created for user ID: ${savedUser.id}`);
 
-    return apiResponse(true, 'Account created successfully. OTP sent.', {
-      id: savedUser.id,
-      fullName,
-      email: savedUser.email,
-    });
+    return new ApiResponseBuilder()
+      .setMessage('Account created successfully. OTP sent.')
+      .setData({
+        id: savedUser.id,
+        fullName,
+        email: savedUser.email,
+      })
+      .build();
   }
 
   async resendOTP(dto: ResendOTPDto): Promise<ApiResponses<any>> {
@@ -115,27 +118,34 @@ export class AuthServiceImpl implements AuthService {
     await this.userRepository.saveUser(user);
     await this.sendOTPMessage(user.email!, otp);
 
-    return apiResponse(true, 'OTP resent successfully.', {
-      id: user.id,
-      fullName: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-    });
+    return new ApiResponseBuilder()
+      .setMessage('OTP resent successfully.')
+      .setData({
+        id: user.id,
+        fullName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+      })
+      .build();
   }
 
   async verifyOTP(data: VerifyOTPDto): Promise<ApiResponses<any>> {
     if (!data.email || !data.otp) {
       throw new BadRequestException('Email and OTP are required');
     }
+
     const user = await this.userRepository.findOneByEmail(data.email);
     if (!user) {
       throw new NotFoundException('User with this email does not exist');
     }
+
     if (user.otpCode !== data.otp) {
       throw new UnauthorizedException('Invalid OTP');
     }
+
     if (user.otpVerified) {
       throw new ConflictException('OTP already verified');
     }
+
     const otpGeneratedAt = user.otpGeneratedAt;
     if (
       !otpGeneratedAt ||
@@ -143,16 +153,22 @@ export class AuthServiceImpl implements AuthService {
     ) {
       throw new UnauthorizedException('OTP expired');
     }
+
     user.otpVerified = true;
     user.status = UserStatus.ACTIVE;
     user.otpCode = undefined;
     user.otpGeneratedAt = undefined;
+
     await this.userRepository.saveUser(user);
-    return apiResponse(true, 'OTP verified successfully.', {
-      id: user.id,
-      fullName: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-    });
+
+    return new ApiResponseBuilder()
+      .setMessage('OTP verified successfully.')
+      .setData({
+        id: user.id,
+        fullName: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+      })
+      .build();
   }
 
   async loginUser(dto: LoginDto): Promise<ApiResponses<any>> {
@@ -177,7 +193,11 @@ export class AuthServiceImpl implements AuthService {
     };
 
     const token = await this.jwtService.signAsync(payload);
-    return apiResponse(true, 'Login Successful', mapperUser(user, token));
+
+    return new ApiResponseBuilder()
+      .setMessage('Login Successful')
+      .setData(mapperUser(user, token))
+      .build();
   }
 
   private generateOTP(email: string): string {
