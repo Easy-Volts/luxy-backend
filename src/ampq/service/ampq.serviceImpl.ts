@@ -37,10 +37,7 @@ export class ListenerServiceImpl {
               this.logger.log(`Message received: ${JSON.stringify(payload)}`);
 
               if (payload.type === 'EMAIL_VERIFICATION') {
-                const status = await this.emailService.sendOTPEmail(
-                  payload,
-                  msg,
-                );
+                const status = await this.emailService.sendOTPEmail(payload);
                 if (status) {
                   this.logger.log(`Email sent successfully to ${payload.to}`);
                   channel.ack(msg);

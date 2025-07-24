@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Message } from 'amqplib';
 import * as nodemailer from 'nodemailer';
 import { CustomLogger } from 'src/log/logs.service';
 
@@ -22,16 +21,12 @@ export class EmailService {
     });
   }
 
-  async sendOTPEmail(
-    payload: {
-      to: string;
-      otp: string;
-      subject: string;
-      type: string;
-    },
-    msg: Message,
-  ): Promise<boolean> {
-    this.logger.log(`Sending Message: ${msg.content.toString()}`);
+  async sendOTPEmail(payload: {
+    to: string;
+    otp: string;
+    subject: string;
+    type: string;
+  }): Promise<boolean> {
     const htmlBody = `
   <div style="max-width: 600px; margin: auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4faff; border: 1px solid #d0e7ff; border-radius: 10px;">
     <div style="text-align: center;">
