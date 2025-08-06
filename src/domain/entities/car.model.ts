@@ -13,7 +13,7 @@ import { Brand } from './brand.model';
 @Entity({ name: 'car' })
 export class Car {
   @PrimaryGeneratedColumn({ type: 'bigint' })
-  id?: number;
+  id!: number;
 
   @Column({ type: 'varchar', length: 100 })
   make!: string;

@@ -25,4 +25,8 @@ export class CustomerRepository {
   async findOneById(id: number): Promise<Customer | null> {
     return this.customerRepository.findOne({ where: { id } });
   }
+
+  async findById(id: number): Promise<Customer | null> {
+    return this.customerRepository.findOne({ where: { id } });
+  }
 }
