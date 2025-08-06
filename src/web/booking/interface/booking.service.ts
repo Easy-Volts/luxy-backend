@@ -18,15 +18,17 @@ export interface BookingService {
     customerId: number | null,
     userId: number,
     query: GetBookingsQueryDto,
-  ): Promise<ApiResponses<{
-    bookings: BookingResponseDto[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  }>>;
+  ): Promise<
+    ApiResponses<{
+      bookings: BookingResponseDto[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>
+  >;
 
   getBookingById(
     bookingId: number,
