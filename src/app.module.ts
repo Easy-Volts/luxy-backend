@@ -6,6 +6,7 @@ import { DomainCheckMiddleware } from './web/middleware/domain.check.middleware'
 import { AuthModule } from './web/auth/module/auth.module';
 import { NotificationModule } from './email-notification/notification.module';
 import { UserModule } from './web/user/module/user.module';
+import { ReviewModule } from './web/review/module/review.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -21,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     NotificationModule,
     UserModule,
+    ReviewModule,
   ],
 })
 export class AppModule {
