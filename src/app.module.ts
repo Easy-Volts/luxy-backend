@@ -7,7 +7,6 @@ import { AuthModule } from './web/auth/module/auth.module';
 import { NotificationModule } from './email-notification/notification.module';
 import { UserModule } from './web/user/module/user.module';
 import { BookingModule } from './web/booking/module/booking.module';
-import { DebugModule } from './web/debug/debug.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -24,7 +23,6 @@ import { ConfigModule } from '@nestjs/config';
     NotificationModule,
     UserModule,
     BookingModule,
-    DebugModule,
   ],
 })
 export class AppModule {
