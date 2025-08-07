@@ -24,6 +24,14 @@ export class BookingServiceImpl implements BookingService {
     createBookingDto: CreateBookingDto,
   ): Promise<ApiResponses<BookingResponseDto>> {
     try {
+      // Validate and parse carId
+      const carId = Number(createBookingDto.carId);
+      if (isNaN(carId)) {
+        return new ApiResponseBuilder<BookingResponseDto>()
+          .setError('Invalid car ID provided')
+          .build();
+      }
+
       // Find customer by userId if customerId is not provided
       let customer;
       if (customerId) {
@@ -40,9 +48,10 @@ export class BookingServiceImpl implements BookingService {
 
       // Validate car exists
       const car = await this.carRepository.findOne({
-        where: { id: createBookingDto.carId },
+        where: { id: carId },
         relations: ['brand'],
       });
+      
       if (!car) {
         return new ApiResponseBuilder<BookingResponseDto>()
           .setError('Car not found')
@@ -74,7 +83,7 @@ export class BookingServiceImpl implements BookingService {
 
       // Check car availability
       const isAvailable = await this.bookingRepository.checkCarAvailability(
-        createBookingDto.carId,
+        carId,
         startDate,
         endDate,
       );
@@ -96,9 +105,9 @@ export class BookingServiceImpl implements BookingService {
       // Create booking
       const bookingData: Partial<Booking> = {
         bookingReference,
-        customerId: customer.id,
+        customerId: customer.id as number,
         userId,
-        carId: createBookingDto.carId,
+        carId: carId,
         startDate,
         endDate,
         startTime: createBookingDto.startTime,

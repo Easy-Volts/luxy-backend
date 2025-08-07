@@ -171,9 +171,11 @@ export class AuthServiceImpl implements AuthService {
     }
 
     const payload = {
+      sub: user.id.toString(),
+      userId: user.id,
       username: user.email,
       appID: 'LUXY-APP',
-      ROLE: user.userType,
+      role: user.userType,
     };
 
     const token = await this.jwtService.signAsync(payload);

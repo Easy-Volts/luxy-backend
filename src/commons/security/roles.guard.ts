@@ -58,10 +58,11 @@ export class RolesGuard implements CanActivate {
     request['user'] = payload;
     this.logger.log(`User authenticated: ${JSON.stringify(payload)}`);
 
-    if (!requiredRoles.includes(payload.role as UserType)) {
-      throw new ForbiddenException(
-        `Access denied for role: ${payload.username}`,
-      );
+    // Handle both old (ROLE) and new (role) token formats for backward compatibility
+    const userRole = (payload.role || (payload as any).ROLE) as string;
+    
+    if (!requiredRoles.includes(userRole as UserType)) {
+      throw new ForbiddenException(`Access denied for role: ${userRole}`);
     }
 
     return true;

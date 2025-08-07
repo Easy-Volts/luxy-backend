@@ -57,9 +57,9 @@ export class BookingController {
   })
   async createBooking(
     @Body() createBookingDto: CreateBookingDto,
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: number } },
   ): Promise<ApiResponses<BookingResponseDto>> {
-    const userId = parseInt(req.user.userId, 10);
+    const userId = req.user.userId;
     return this.bookingService.createBooking(null, userId, createBookingDto);
   }
 
@@ -93,7 +93,7 @@ export class BookingController {
   })
   async getCustomerBookings(
     @Query() query: GetBookingsQueryDto,
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: number } },
   ): Promise<
     ApiResponses<{
       bookings: BookingResponseDto[];
@@ -105,7 +105,7 @@ export class BookingController {
       };
     }>
   > {
-    const userId = parseInt(req.user.userId, 10);
+    const userId = req.user.userId;
 
     return this.bookingService.getCustomerBookings(null, userId, query);
   }
@@ -128,9 +128,9 @@ export class BookingController {
   })
   async getBookingById(
     @Param('id', ParseIntPipe) id: number,
-    @Request() req: { user: { userId: string } },
+    @Request() req: { user: { userId: number } },
   ): Promise<ApiResponses<BookingResponseDto>> {
-    const userId = parseInt(req.user.userId, 10);
+    const userId = req.user.userId;
     return this.bookingService.getBookingById(id, null, userId);
   }
 }
