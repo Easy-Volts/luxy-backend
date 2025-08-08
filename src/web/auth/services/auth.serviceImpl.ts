@@ -171,7 +171,9 @@ export class AuthServiceImpl implements AuthService {
     }
 
     const payload = {
+      sub: user.id!.toString(),
       username: user.email,
+      role: user.userType,
       appID: 'LUXY-APP',
       ROLE: user.userType,
     };
