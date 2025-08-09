@@ -5,11 +5,37 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/domain/entities/user.model';
 import { Customer } from 'src/domain/entities/customer.model';
 import { Wallet } from 'src/domain/entities/wallet.model';
+import { Car } from 'src/domain/entities/car.model';
+import { Brand } from 'src/domain/entities/brand.model';
+import { Vendor } from 'src/domain/entities/vendor.model';
+import { CarBooking } from 'src/domain/entities/car.lending.model';
 import { UserRepository } from 'src/domain/repository/user.repository';
+import { CustomerRepository } from 'src/domain/repository/customer.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users, Customer, Wallet])],
-  providers: [CustomLogger, EmailService, UserRepository],
-  exports: [CustomLogger, EmailService, TypeOrmModule, UserRepository],
+  imports: [
+    TypeOrmModule.forFeature([
+      Users, 
+      Customer, 
+      Wallet, 
+      Car, 
+      Brand, 
+      Vendor, 
+      CarBooking
+    ])
+  ],
+  providers: [
+    CustomLogger, 
+    EmailService, 
+    UserRepository, 
+    CustomerRepository
+  ],
+  exports: [
+    CustomLogger, 
+    EmailService, 
+    TypeOrmModule, 
+    UserRepository, 
+    CustomerRepository
+  ],
 })
 export class SharedModule {}
