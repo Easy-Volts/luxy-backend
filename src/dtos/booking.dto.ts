@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AppRequest } from './app.request';
-import { PaymentMethod } from '../domain/entities/car.lending.model';
+import { PaymentMethod } from 'src/enums/user.enum';
 
 export class CreateBookingDto extends AppRequest {
   @ApiProperty({ description: 'Car ID to book' })

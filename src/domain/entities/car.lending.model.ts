@@ -9,33 +9,14 @@ import {
 } from 'typeorm';
 import { Car } from './car.model';
 import { Customer } from './customer.model';
-
-export enum BookingStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  REJECTED = 'REJECTED',
-}
-
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  FAILED = 'FAILED',
-  REFUNDED = 'REFUNDED',
-}
-
-export enum PaymentMethod {
-  CREDIT_CARD = 'CREDIT_CARD',
-  WALLET = 'WALLET',
-  APPLE_PAY = 'APPLE_PAY',
-  PAYPAL = 'PAYPAL',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-}
+import {
+  BookingStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from 'src/enums/user.enum';
 
 @Entity({ name: 'car_booking' })
-export class CarBooking {
+export class CarLending {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id?: number;
 

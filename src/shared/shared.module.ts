@@ -8,34 +8,29 @@ import { Wallet } from 'src/domain/entities/wallet.model';
 import { Car } from 'src/domain/entities/car.model';
 import { Brand } from 'src/domain/entities/brand.model';
 import { Vendor } from 'src/domain/entities/vendor.model';
-import { CarBooking } from 'src/domain/entities/car.lending.model';
+import { CarLending } from 'src/domain/entities/car.lending.model';
 import { UserRepository } from 'src/domain/repository/user.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Users, 
-      Customer, 
-      Wallet, 
-      Car, 
-      Brand, 
-      Vendor, 
-      CarBooking
-    ])
+      Users,
+      Customer,
+      Wallet,
+      Car,
+      Brand,
+      Vendor,
+      CarLending,
+    ]),
   ],
-  providers: [
-    CustomLogger, 
-    EmailService, 
-    UserRepository, 
-    CustomerRepository
-  ],
+  providers: [CustomLogger, EmailService, UserRepository, CustomerRepository],
   exports: [
-    CustomLogger, 
-    EmailService, 
-    TypeOrmModule, 
-    UserRepository, 
-    CustomerRepository
+    CustomLogger,
+    EmailService,
+    TypeOrmModule,
+    UserRepository,
+    CustomerRepository,
   ],
 })
 export class SharedModule {}

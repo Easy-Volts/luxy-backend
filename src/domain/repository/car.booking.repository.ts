@@ -1,34 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { CarBooking, BookingStatus } from '../entities/car.lending.model';
+import { CarLending } from '../entities/car.lending.model';
+import { BookingStatus } from 'src/enums/user.enum';
 
 @Injectable()
-export class CarBookingRepository {
+export class CarLendingRepository {
   constructor(
-    @InjectRepository(CarBooking)
-    private bookingRepository: Repository<CarBooking>,
+    @InjectRepository(CarLending)
+    private bookingRepository: Repository<CarLending>,
   ) {}
 
-  async saveBooking(booking: CarBooking): Promise<CarBooking> {
+  async saveBooking(booking: CarLending): Promise<CarLending> {
     return this.bookingRepository.save(booking);
   }
 
-  async findById(id: number): Promise<CarBooking | null> {
+  async findById(id: number): Promise<CarLending | null> {
     return this.bookingRepository.findOne({
       where: { id },
       relations: ['customer', 'car', 'car.brand'],
     });
   }
 
-  async findByReference(reference: string): Promise<CarBooking | null> {
+  async findByReference(reference: string): Promise<CarLending | null> {
     return this.bookingRepository.findOne({
       where: { bookingReference: reference },
       relations: ['customer', 'car', 'car.brand'],
     });
   }
 
-  async findByCustomerId(customerId: number): Promise<CarBooking[]> {
+  async findByCustomerId(customerId: number): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: { customerId },
       relations: ['customer', 'car', 'car.brand'],
@@ -36,7 +37,7 @@ export class CarBookingRepository {
     });
   }
 
-  async findByCarId(carId: number): Promise<CarBooking[]> {
+  async findByCarId(carId: number): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: { carId },
       relations: ['customer', 'car', 'car.brand'],
@@ -44,7 +45,7 @@ export class CarBookingRepository {
     });
   }
 
-  async findActiveBookings(): Promise<CarBooking[]> {
+  async findActiveBookings(): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: {
         status: BookingStatus.ACTIVE,
@@ -58,7 +59,7 @@ export class CarBookingRepository {
     carId: number,
     startDate: Date,
     endDate: Date,
-  ): Promise<CarBooking[]> {
+  ): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: [
         {
@@ -85,7 +86,7 @@ export class CarBookingRepository {
     });
   }
 
-  async findAll(): Promise<CarBooking[]> {
+  async findAll(): Promise<CarLending[]> {
     return this.bookingRepository.find({
       relations: ['customer', 'car', 'car.brand'],
       order: { createdAt: 'DESC' },
@@ -95,12 +96,12 @@ export class CarBookingRepository {
   async updateBookingStatus(
     id: number,
     status: BookingStatus,
-  ): Promise<CarBooking | null> {
+  ): Promise<CarLending | null> {
     const booking = await this.findById(id);
     if (!booking) return null;
 
     booking.status = status;
-    
+
     if (status === BookingStatus.CONFIRMED) {
       booking.confirmedAt = new Date();
     } else if (status === BookingStatus.CANCELLED) {

@@ -1,26 +1,24 @@
-import { 
-  Injectable, 
-  NotFoundException, 
-  BadRequestException, 
-  ConflictException 
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { BookingService } from '../interface/booking.service';
-import { CarBookingRepository } from 'src/domain/repository/car.booking.repository';
+import { CarLendingRepository } from 'src/domain/repository/car.booking.repository';
 import { CarRepository } from 'src/domain/repository/car.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { CustomLogger } from 'src/log/logs.service';
-import { 
-  CreateBookingDto, 
-  BookingResponseDto
-} from 'src/dtos/booking.dto';
+import { CreateBookingDto, BookingResponseDto } from 'src/dtos/booking.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { apiResponse } from 'src/commons/utils/mapper';
-import { CarBooking, BookingStatus, PaymentStatus } from 'src/domain/entities/car.lending.model';
+import { CarLending } from 'src/domain/entities/car.lending.model';
+import { BookingStatus, PaymentStatus } from 'src/enums/user.enum';
 
 @Injectable()
 export class BookingServiceImpl implements BookingService {
   constructor(
-    private readonly bookingRepository: CarBookingRepository,
+    private readonly bookingRepository: CarLendingRepository,
     private readonly carRepository: CarRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly logger: CustomLogger,
@@ -29,10 +27,12 @@ export class BookingServiceImpl implements BookingService {
   }
 
   async createBooking(
-    customerId: number, 
-    dto: CreateBookingDto
+    customerId: number,
+    dto: CreateBookingDto,
   ): Promise<ApiResponses<BookingResponseDto>> {
-    this.logger.log(`Creating booking for customer ${customerId}, car ${dto.carId}`);
+    this.logger.log(
+      `Creating booking for customer ${customerId}, car ${dto.carId}`,
+    );
 
     // Validate customer exists
     const customer = await this.customerRepository.findOneByUserId(customerId);
@@ -65,14 +65,17 @@ export class BookingServiceImpl implements BookingService {
     }
 
     // Check availability
-    const conflictingBookings = await this.bookingRepository.findBookingsByDateRange(
-      dto.carId,
-      startDate,
-      endDate
-    );
+    const conflictingBookings =
+      await this.bookingRepository.findBookingsByDateRange(
+        dto.carId,
+        startDate,
+        endDate,
+      );
 
     if (conflictingBookings.length > 0) {
-      throw new ConflictException('Car is not available for the selected dates');
+      throw new ConflictException(
+        'Car is not available for the selected dates',
+      );
     }
 
     // Calculate pricing
@@ -80,7 +83,9 @@ export class BookingServiceImpl implements BookingService {
       throw new BadRequestException('Car price is not set');
     }
 
-    const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const totalDays = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
     const pricePerDay = Number(car.price);
     const subtotal = pricePerDay * totalDays;
     const taxRate = 0.075; // 7.5% tax
@@ -91,7 +96,7 @@ export class BookingServiceImpl implements BookingService {
     const bookingReference = this.generateBookingReference();
 
     // Create booking
-    const booking = new CarBooking();
+    const booking = new CarLending();
     booking.bookingReference = bookingReference;
     booking.customerId = customer.id!;
     booking.carId = dto.carId;
@@ -114,11 +119,13 @@ export class BookingServiceImpl implements BookingService {
     const responseData = this.mapToBookingResponse(savedBooking);
 
     this.logger.log(`Booking created successfully: ${bookingReference}`);
-    
+
     return apiResponse(true, 'Booking created successfully', responseData);
   }
 
-  async getCustomerBookings(customerId: number): Promise<ApiResponses<BookingResponseDto[]>> {
+  async getCustomerBookings(
+    customerId: number,
+  ): Promise<ApiResponses<BookingResponseDto[]>> {
     this.logger.log(`Fetching bookings for customer ${customerId}`);
 
     const customer = await this.customerRepository.findOneByUserId(customerId);
@@ -126,8 +133,12 @@ export class BookingServiceImpl implements BookingService {
       throw new NotFoundException('Customer not found');
     }
 
-    const bookings = await this.bookingRepository.findByCustomerId(customer.id!);
-    const responseData = bookings.map(booking => this.mapToBookingResponse(booking));
+    const bookings = await this.bookingRepository.findByCustomerId(
+      customer.id!,
+    );
+    const responseData = bookings.map((booking) =>
+      this.mapToBookingResponse(booking),
+    );
 
     return apiResponse(true, 'Bookings retrieved successfully', responseData);
   }
@@ -136,34 +147,46 @@ export class BookingServiceImpl implements BookingService {
     this.logger.log('Fetching all bookings');
 
     const bookings = await this.bookingRepository.findAll();
-    const responseData = bookings.map(booking => this.mapToBookingResponse(booking));
+    const responseData = bookings.map((booking) =>
+      this.mapToBookingResponse(booking),
+    );
 
-    return apiResponse(true, 'All bookings retrieved successfully', responseData);
+    return apiResponse(
+      true,
+      'All bookings retrieved successfully',
+      responseData,
+    );
   }
 
   private generateBookingReference(): string {
     const prefix = 'LBK';
     const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const random = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0');
     return `${prefix}${timestamp.slice(-8)}${random}`;
   }
 
-  private mapToBookingResponse(booking: CarBooking): BookingResponseDto {
+  private mapToBookingResponse(booking: CarLending): BookingResponseDto {
     return {
       id: booking.id,
       bookingReference: booking.bookingReference,
       carId: booking.carId,
-      carDetails: booking.car ? {
-        make: booking.car.make,
-        model: booking.car.model,
-        year: booking.car.year,
-        color: booking.car.color,
-        licensePlate: booking.car.licensePlate,
-        brand: booking.car.brand ? {
-          name: booking.car.brand.name,
-          image: booking.car.brand.image,
-        } : undefined,
-      } : undefined,
+      carDetails: booking.car
+        ? {
+            make: booking.car.make,
+            model: booking.car.model,
+            year: booking.car.year,
+            color: booking.car.color,
+            licensePlate: booking.car.licensePlate,
+            brand: booking.car.brand
+              ? {
+                  name: booking.car.brand.name,
+                  image: booking.car.brand.image,
+                }
+              : undefined,
+          }
+        : undefined,
       startDate: booking.startDate.toISOString().split('T')[0],
       endDate: booking.endDate.toISOString().split('T')[0],
       startTime: booking.startTime,

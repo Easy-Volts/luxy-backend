@@ -14,10 +14,8 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  // Use custom logger
   app.useLogger(app.get(CustomLogger));
 
-  // Enable security best practices
   app.use(helmet()); // Helps secure the app by setting HTTP headers
   app.use(compression()); // Improves performance by compressing responses
 
@@ -37,7 +35,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/swagger', app, document);
 
   // Global validation pipes
   app.useGlobalPipes(
@@ -51,7 +49,7 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   Logger.log(
-    `🚀 Luxy API running on http://localhost:${port}/api`,
+    `🚀 Luxy API running on http://localhost:${port}/api/swagger`,
     'Bootstrap',
   );
 }
