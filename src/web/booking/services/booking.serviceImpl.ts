@@ -14,7 +14,7 @@ import { ApiResponses } from 'src/dtos/response';
 import { apiResponse } from 'src/commons/utils/mapper';
 import { CarLending } from 'src/domain/entities/car.lending.model';
 import { BookingStatus, PaymentStatus } from 'src/enums/user.enum';
-
+import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 @Injectable()
 export class BookingServiceImpl implements BookingService {
   constructor(
@@ -27,15 +27,15 @@ export class BookingServiceImpl implements BookingService {
   }
 
   async createBooking(
-    customerId: number,
+    user: UserDetails,
     dto: CreateBookingDto,
   ): Promise<ApiResponses<BookingResponseDto>> {
     this.logger.log(
-      `Creating booking for customer ${customerId}, car ${dto.carId}`,
+      `Creating booking for customer ${user.username}, car ${dto.carId}`,
     );
 
     // Validate customer exists
-    const customer = await this.customerRepository.findOneByUserId(customerId);
+    const customer = await this.customerRepository.findOneByUserId(user.userId);
     if (!customer) {
       throw new NotFoundException('Customer not found');
     }
@@ -124,11 +124,11 @@ export class BookingServiceImpl implements BookingService {
   }
 
   async getCustomerBookings(
-    customerId: number,
+    user: UserDetails,
   ): Promise<ApiResponses<BookingResponseDto[]>> {
-    this.logger.log(`Fetching bookings for customer ${customerId}`);
+    this.logger.log(`Fetching bookings for customer ${user.username}`);
 
-    const customer = await this.customerRepository.findOneByUserId(customerId);
+    const customer = await this.customerRepository.findOneByUserId(user.userId);
     if (!customer) {
       throw new NotFoundException('Customer not found');
     }

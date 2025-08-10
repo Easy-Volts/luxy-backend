@@ -1,38 +1,25 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Inject,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBody
-} from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Inject, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { BOOKING_SERVICE, BookingService } from '../interface/booking.service';
-import { 
-  CreateBookingDto, 
-  BookingResponseDto
-} from 'src/dtos/booking.dto';
+import { CreateBookingDto, BookingResponseDto } from 'src/dtos/booking.dto';
 import { AuthGuard } from 'src/commons/security/guard';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { UserType } from 'src/enums/user.enum';
 import { Roles } from 'src/commons/decorator/roles.decorator';
 import { Authenticated } from 'src/commons/decorator/auth.decorator';
 import { ApiResponses } from 'src/dtos/response';
+import { CurrentUser } from 'src/commons/decorator/current-user.decorator';
+import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 @ApiTags('Bookings')
 @Controller('api/v1/bookings')
 @UseGuards(AuthGuard, RolesGuard)
+@Roles(UserType.ADMIN, UserType.CUSTOMER)
 @Authenticated()
 export class BookingController {
   constructor(
-    @Inject(BOOKING_SERVICE) 
-    private readonly bookingService: BookingService
+    @Inject(BOOKING_SERVICE)
+    private readonly bookingService: BookingService,
   ) {}
 
   @Post()
@@ -46,14 +33,13 @@ export class BookingController {
   })
   async createBooking(
     @Body() dto: CreateBookingDto,
-    @Request() req: any,
+    @CurrentUser() currentUser: UserDetails,
   ): Promise<ApiResponses<BookingResponseDto>> {
-    const customerId = req.user?.sub || req.user?.userId;
-    return this.bookingService.createBooking(customerId, dto);
+    return this.bookingService.createBooking(currentUser, dto);
   }
 
   @Get()
-  @Roles(UserType.CUSTOMER, UserType.ADMIN, UserType.VENDOR)
+  @Roles(UserType.CUSTOMER, UserType.ADMIN)
   @ApiOperation({ summary: 'Get list of bookings' })
   @ApiResponse({
     status: 200,
@@ -61,17 +47,10 @@ export class BookingController {
     type: [BookingResponseDto],
   })
   async getBookings(
-    @Request() req: any,
+    @CurrentUser() currentUser: UserDetails,
   ): Promise<ApiResponses<BookingResponseDto[]>> {
-    const customerId = req.user?.sub || req.user?.userId;
-    const userRole = req.user?.role || req.user?.ROLE;
-    
-    // If user is a customer, return only their bookings
-    if (userRole === UserType.CUSTOMER) {
-      return this.bookingService.getCustomerBookings(customerId);
-    }
-    
-    // If user is admin or vendor, return all bookings
-    return this.bookingService.getAllBookings();
+    return this.bookingService.getCustomerBookings(currentUser);
+
+    // return this.bookingService.getAllBookings();
   }
 }

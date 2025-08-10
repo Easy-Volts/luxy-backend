@@ -5,12 +5,13 @@ import {
   ReviewResponseDto,
   ReviewStatsDto,
 } from '../../../dtos/review.dto';
+import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 export const REVIEW_SERVICE = Symbol('REVIEW_SERVICE');
 
 export interface ReviewService {
   createReview(
-    reviewerId: number,
+    reviewerId: UserDetails,
     createReviewDto: CreateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>>;
 
@@ -34,12 +35,12 @@ export interface ReviewService {
 
   updateReview(
     id: number,
-    reviewerId: number,
+    reviewerId: UserDetails,
     updateReviewDto: UpdateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>>;
 
   deleteReview(
     id: number,
-    reviewerId: number,
+    reviewerId: UserDetails,
   ): Promise<ApiResponses<{ message: string }>>;
 }

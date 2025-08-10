@@ -3,7 +3,7 @@ export interface JwtPayload {
   username: string;
   role: string;
   appID?: string;
-  ROLE?: string;
+  userId: number;
   iat?: number;
   exp?: number;
 }

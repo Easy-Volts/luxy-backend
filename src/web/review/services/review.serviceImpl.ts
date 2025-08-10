@@ -9,18 +9,19 @@ import {
   ReviewStatsDto,
 } from '../../../dtos/review.dto';
 import { Review } from '../../../domain/entities/review.model';
+import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 @Injectable()
 export class ReviewServiceImpl implements ReviewService {
   constructor(private readonly reviewRepository: ReviewRepository) {}
 
   async createReview(
-    reviewerId: number,
+    reviewer: UserDetails,
     createReviewDto: CreateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>> {
     try {
       // Validate that reviewer is not reviewing themselves
-      if (reviewerId === createReviewDto.revieweeId) {
+      if (reviewer.userId === createReviewDto.revieweeId) {
         return new ApiResponseBuilder<ReviewResponseDto>()
           .setError('You cannot review yourself')
           .build();
@@ -28,7 +29,7 @@ export class ReviewServiceImpl implements ReviewService {
 
       const reviewData: Partial<Review> = {
         ...createReviewDto,
-        reviewerId,
+        reviewerId: reviewer.userId,
       };
 
       const createdReview = await this.reviewRepository.create(reviewData);
@@ -74,8 +75,7 @@ export class ReviewServiceImpl implements ReviewService {
   ): Promise<ApiResponses<ReviewResponseDto[]>> {
     try {
       const reviews = await this.reviewRepository.findByRevieweeId(revieweeId);
-      
-      // Filter by review type if provided
+
       const filteredReviews = reviewType
         ? reviews.filter((review) => review.reviewType === reviewType)
         : reviews;
@@ -172,7 +172,7 @@ export class ReviewServiceImpl implements ReviewService {
 
   async updateReview(
     id: number,
-    reviewerId: number,
+    reviewer: UserDetails,
     updateReviewDto: UpdateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>> {
     try {
@@ -185,7 +185,7 @@ export class ReviewServiceImpl implements ReviewService {
       }
 
       // Check if the reviewer owns this review
-      if (existingReview.reviewerId !== reviewerId) {
+      if (existingReview.reviewerId !== reviewer.userId) {
         return new ApiResponseBuilder<ReviewResponseDto>()
           .setError('You can only update your own reviews')
           .build();
@@ -209,7 +209,7 @@ export class ReviewServiceImpl implements ReviewService {
 
   async deleteReview(
     id: number,
-    reviewerId: number,
+    reviewer: UserDetails,
   ): Promise<ApiResponses<{ message: string }>> {
     try {
       const existingReview = await this.reviewRepository.findById(id);
@@ -221,7 +221,7 @@ export class ReviewServiceImpl implements ReviewService {
       }
 
       // Check if the reviewer owns this review
-      if (existingReview.reviewerId !== reviewerId) {
+      if (existingReview.reviewerId !== reviewer.userId) {
         return new ApiResponseBuilder<{ message: string }>()
           .setError('You can only delete your own reviews')
           .build();

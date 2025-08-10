@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   Inject,
   UseGuards,
-  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -33,13 +32,8 @@ import { RolesGuard } from '../../../commons/security/roles.guard';
 import { UserType } from '../../../enums/user.enum';
 import { Roles } from '../../../commons/decorator/roles.decorator';
 import { Authenticated } from '../../../commons/decorator/auth.decorator';
-
-interface AuthenticatedRequest {
-  user: {
-    userId: number;
-    userType: UserType;
-  };
-}
+import { CurrentUser } from 'src/commons/decorator/current-user.decorator';
+import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -62,11 +56,10 @@ export class ReviewController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Roles(UserType.CUSTOMER, UserType.ADMIN)
   async createReview(
-    @Request() req: AuthenticatedRequest,
+    @CurrentUser() req: UserDetails,
     @Body() createReviewDto: CreateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>> {
-    const reviewerId: number = req.user.userId;
-    return this.reviewService.createReview(reviewerId, createReviewDto);
+    return this.reviewService.createReview(req, createReviewDto);
   }
 
   @Get(':id')
@@ -170,12 +163,11 @@ export class ReviewController {
   @ApiResponse({ status: 404, description: 'Review not found' })
   @Roles(UserType.CUSTOMER, UserType.ADMIN)
   async updateReview(
-    @Request() req: AuthenticatedRequest,
+    @CurrentUser() req: UserDetails,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateReviewDto: UpdateReviewDto,
   ): Promise<ApiResponses<ReviewResponseDto>> {
-    const reviewerId: number = req.user.userId;
-    return this.reviewService.updateReview(id, reviewerId, updateReviewDto);
+    return this.reviewService.updateReview(id, req, updateReviewDto);
   }
 
   @Delete(':id')
@@ -189,11 +181,10 @@ export class ReviewController {
   @ApiResponse({ status: 404, description: 'Review not found' })
   @Roles(UserType.CUSTOMER, UserType.ADMIN)
   async deleteReview(
-    @Request() req: AuthenticatedRequest,
+    @CurrentUser() req: UserDetails,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponses<{ message: string }>> {
-    const reviewerId: number = req.user.userId;
-    return this.reviewService.deleteReview(id, reviewerId);
+    return this.reviewService.deleteReview(id, req);
   }
 
   @Get('my/reviews')
@@ -205,9 +196,8 @@ export class ReviewController {
   })
   @Roles(UserType.CUSTOMER, UserType.ADMIN)
   async getMyReviews(
-    @Request() req: AuthenticatedRequest,
+    @CurrentUser() req: UserDetails,
   ): Promise<ApiResponses<ReviewResponseDto[]>> {
-    const reviewerId: number = req.user.userId;
-    return this.reviewService.getReviewsByReviewerId(reviewerId);
+    return this.reviewService.getReviewsByReviewerId(req.userId);
   }
 }
