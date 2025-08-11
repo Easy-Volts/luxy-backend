@@ -6,11 +6,14 @@ import {
   ParseIntPipe,
   Inject,
   UseGuards,
+  Put,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { USER_SERVICE, UserService } from '../interface/user.service';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
-import { Users } from '../../../domain/entities/user.model'; // Adjust path to your Users entity
+import { Users } from '../../../domain/entities/user.model';
+import { UpdateProfileDto } from 'src/dtos/update.profile.dto';
 import { AuthGuard } from 'src/commons/security/guard';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { UserType } from 'src/enums/user.enum';
@@ -24,10 +27,10 @@ import { ApiResponses } from 'src/dtos/response';
 @Authenticated()
 @Roles(UserType.ADMIN, UserType.CUSTOMER)
 export class UserController {
-  private userService: UserService;
-  constructor(@Inject(USER_SERVICE) userService: UserService) {
-    this.userService = userService;
-  }
+  constructor(
+    @Inject(USER_SERVICE) private readonly userService: UserService,
+  ) {}
+
   @Patch(':id/location')
   @ApiOperation({ summary: 'Update user location by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'User ID' })
@@ -41,5 +44,20 @@ export class UserController {
     @Body() dto: UpdateLocationDto,
   ): Promise<ApiResponses<any>> {
     return this.userService.updateUserLocation(id, dto);
+  }
+
+  @Put('profile')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+    type: Users,
+  })
+  async updateProfile(
+    @Req() req: { user: { id: number } },
+    @Body() dto: UpdateProfileDto,
+  ): Promise<ApiResponses<any>> {
+    const userId: number = req.user.id;
+    return this.userService.updateUserProfile(userId, dto);
   }
 }
