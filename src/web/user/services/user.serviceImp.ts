@@ -19,7 +19,6 @@ export class UserServiceImpl implements UserService {
 
     Object.assign(user, dto);
     user.locationVerified = true;
-    user.lastUpdated = new Date();
 
     await this.userRepository.saveUser(user);
 
@@ -30,19 +29,16 @@ export class UserServiceImpl implements UserService {
   }
 
   async updateUserProfile(
-    userId: number,
+    userContext: { id: number },
     dto: UpdateProfileDto,
   ): Promise<ApiResponses<any>> {
-    const user = await this.userRepository.findOneById(userId);
+    const user = await this.userRepository.findOneById(userContext.id);
     if (!user) throw new NotFoundException('User not found');
 
-    // Merge updates
     Object.assign(user, dto);
-    user.lastUpdated = new Date();
 
     await this.userRepository.saveUser(user);
 
-    // Remove sensitive fields before returning
     const safeUser = { ...user };
     delete safeUser.password;
 

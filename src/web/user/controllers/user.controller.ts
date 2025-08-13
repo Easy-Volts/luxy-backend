@@ -57,7 +57,6 @@ export class UserController {
     @Req() req: { user: { id: number } },
     @Body() dto: UpdateProfileDto,
   ): Promise<ApiResponses<any>> {
-    const userId: number = req.user.id;
-    return this.userService.updateUserProfile(userId, dto);
+    return this.userService.updateUserProfile(req.user, dto);
   }
 }
