@@ -1,4 +1,3 @@
-// src/modules/user/service/user.service.impl.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../../../domain/repository/user.repository';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
@@ -11,10 +10,10 @@ export class UserServiceImpl implements UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async updateUserLocation(
-    userId: number,
+    userContext: { id: number },
     dto: UpdateLocationDto,
   ): Promise<ApiResponses<any>> {
-    const user = await this.userRepository.findOneById(userId);
+    const user = await this.userRepository.findOneById(userContext.id);
     if (!user) throw new NotFoundException('User not found');
 
     Object.assign(user, dto);

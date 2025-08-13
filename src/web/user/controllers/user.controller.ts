@@ -1,15 +1,12 @@
 import {
   Controller,
   Patch,
-  Param,
   Body,
-  ParseIntPipe,
   Inject,
   UseGuards,
   Put,
-  Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { USER_SERVICE, UserService } from '../interface/user.service';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
 import { Users } from '../../../domain/entities/user.model';
@@ -20,6 +17,7 @@ import { UserType } from 'src/enums/user.enum';
 import { Roles } from 'src/commons/decorator/roles.decorator';
 import { Authenticated } from 'src/commons/decorator/auth.decorator';
 import { ApiResponses } from 'src/dtos/response';
+import { CurrentUser } from 'src/commons/decorator/current-user.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -31,19 +29,18 @@ export class UserController {
     @Inject(USER_SERVICE) private readonly userService: UserService,
   ) {}
 
-  @Patch(':id/location')
-  @ApiOperation({ summary: 'Update user location by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @Patch('location')
+  @ApiOperation({ summary: 'Update current user location' })
   @ApiResponse({
     status: 200,
     description: 'User location updated successfully',
     type: Users,
   })
   async updateUserLocation(
-    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: { id: number },
     @Body() dto: UpdateLocationDto,
   ): Promise<ApiResponses<any>> {
-    return this.userService.updateUserLocation(id, dto);
+    return this.userService.updateUserLocation(user, dto);
   }
 
   @Put('profile')
@@ -54,9 +51,9 @@ export class UserController {
     type: Users,
   })
   async updateProfile(
-    @Req() req: { user: { id: number } },
+    @CurrentUser() user: { id: number },
     @Body() dto: UpdateProfileDto,
   ): Promise<ApiResponses<any>> {
-    return this.userService.updateUserProfile(req.user, dto);
+    return this.userService.updateUserProfile(user, dto);
   }
 }

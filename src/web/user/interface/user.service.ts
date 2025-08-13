@@ -4,9 +4,10 @@ import { ApiResponses } from 'src/dtos/response';
 
 export interface UserService {
   updateUserLocation(
-    userId: number,
+    userContext: { id: number },
     dto: UpdateLocationDto,
   ): Promise<ApiResponses<any>>;
+
   updateUserProfile(
     userContext: { id: number },
     dto: UpdateProfileDto,
