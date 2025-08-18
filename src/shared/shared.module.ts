@@ -11,6 +11,7 @@ import { Vendor } from 'src/domain/entities/vendor.model';
 import { CarLending } from 'src/domain/entities/car.lending.model';
 import { UserRepository } from 'src/domain/repository/user.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
+import { NotificationRepository } from 'src/domain/repository/notification.repository';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CustomerRepository } from 'src/domain/repository/customer.repository';
       Brand,
       Vendor,
       CarLending,
+      NotificationRepository,
     ]),
   ],
   providers: [CustomLogger, EmailService, UserRepository, CustomerRepository],

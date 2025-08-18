@@ -8,6 +8,7 @@ import { NotificationModule } from './email-notification/notification.module';
 import { UserModule } from './web/user/module/user.module';
 import { ReviewModule } from './web/review/module/review.module';
 import { ConfigModule } from '@nestjs/config';
+import { NotificationsModule } from './web/notification/module/notification.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ConfigModule } from '@nestjs/config';
     NotificationModule,
     UserModule,
     ReviewModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {
