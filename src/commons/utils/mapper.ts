@@ -12,7 +12,6 @@ export const mapperUser = (user: Users, token: string) => {
     token: token,
     status: user.status,
     type: user.userType,
-
     phoneVerified: user.phoneVerified,
     deviceId: user.deviceId,
     imageUrl: user.imageUrl,
@@ -21,7 +20,7 @@ export const mapperUser = (user: Users, token: string) => {
   };
 };
 
-export const apiResponse = (status: boolean, message: string, data: any) => {
+export const apiResponse = (message: string, data: any) => {
   return new ApiResponseBuilder<any>()
     .setMessage(message)
     .setData(data)
@@ -58,7 +57,6 @@ export const allCarsResponse = (
       ownershipCertificateUrl: car.ownershipCertificateUrl,
       brand: car?.brand ?? undefined,
       vendor: car?.vendor ?? undefined,
-
       status: car.status,
     };
   });

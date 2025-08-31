@@ -48,7 +48,7 @@ export class AuthServiceImpl implements AuthService {
       userType = '',
     } = dto;
 
-    this.logger.log(`Creating account for email: ${email}`);
+    this.logger.log(`Creating account for account: ${JSON.stringify(dto)}`);
 
     const existingUser = await this.userRepository.findOneByEmail(email!);
     if (existingUser) {
@@ -90,7 +90,7 @@ export class AuthServiceImpl implements AuthService {
 
     this.logger.log(`Customer record created for user ID: ${savedUser.id}`);
 
-    return apiResponse(true, 'Account created successfully. OTP sent.', {
+    return apiResponse('Account created successfully. OTP sent.', {
       id: savedUser.id,
       fullName,
       email: savedUser.email,
@@ -115,7 +115,7 @@ export class AuthServiceImpl implements AuthService {
     await this.userRepository.saveUser(user);
     await this.sendOTPMessage(user.email!, otp);
 
-    return apiResponse(true, 'OTP resent successfully.', {
+    return apiResponse('OTP resent successfully.', {
       id: user.id,
       fullName: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -148,7 +148,7 @@ export class AuthServiceImpl implements AuthService {
     user.otpCode = undefined;
     user.otpGeneratedAt = undefined;
     await this.userRepository.saveUser(user);
-    return apiResponse(true, 'OTP verified successfully.', {
+    return apiResponse('OTP verified successfully.', {
       id: user.id,
       fullName: `${user.firstName} ${user.lastName}`,
       email: user.email,
@@ -171,15 +171,16 @@ export class AuthServiceImpl implements AuthService {
     }
 
     const payload = {
-      sub: user.id!.toString(),
-      username: user.email,
+      sub: user.email,
+      username: user.firstName,
+      email: user.email,
       role: user.userType,
       appID: 'LUXY-APP',
-      ROLE: user.userType,
+      userId: user.id,
     };
 
     const token = await this.jwtService.signAsync(payload);
-    return apiResponse(true, 'Login Successful', mapperUser(user, token));
+    return apiResponse('Login Successful', mapperUser(user, token));
   }
 
   private generateOTP(email: string): string {
@@ -189,14 +190,15 @@ export class AuthServiceImpl implements AuthService {
   }
 
   private async sendOTPMessage(to: string, otp: string): Promise<void> {
-    await this.rabbitMQ.sendMessageOTP(
-      {
-        to,
-        otp,
+    const payload = {
+      data: {
+        to: to,
+        otp: otp,
         subject: 'Verify Your Email - Luxy',
         type: 'EMAIL_VERIFICATION',
       },
-      'otp-queue',
-    );
+      queue: 'otp-queue',
+    };
+    await this.rabbitMQ.sendMessageOTP(payload);
   }
 }

@@ -1,8 +1,20 @@
-import { IsEmail, IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { AppRequest } from './app.request';
-
-export class CreateAccountDto extends AppRequest {
+import {
+  IsEmail,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UserType } from 'src/enums/user.enum';
+export class CreateAccountDto {
+  @ApiPropertyOptional({
+    enum: UserType,
+    default: UserType.CUSTOMER,
+  })
+  @IsOptional()
+  @IsEnum(UserType)
+  userType?: UserType = UserType.CUSTOMER;
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()

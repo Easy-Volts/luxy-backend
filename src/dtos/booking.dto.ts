@@ -7,10 +7,10 @@ import {
   IsNumber,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AppRequest } from './app.request';
 import { PaymentMethod } from 'src/enums/user.enum';
+import { PaymentInitResponse } from './payment-init-response.dto';
 
-export class CreateBookingDto extends AppRequest {
+export class CreateBookingDto {
   @ApiProperty({ description: 'Car ID to book' })
   @IsNotEmpty()
   @IsNumber()
@@ -62,6 +62,7 @@ export class CreateBookingDto extends AppRequest {
 }
 
 export class BookingResponseDto {
+  paymentInitResponse!: PaymentInitResponse;
   id?: number;
   bookingReference!: string;
   carId!: number;

@@ -14,7 +14,18 @@ export class RabbitMQService {
     this.logger.setContext(RabbitMQService.name);
   }
 
-  async sendMessageOTP(message: any, queueName: string) {
+  async sendMessageOTP(data: {
+    data: {
+      to: string;
+      otp: string;
+      subject: string;
+      type: string;
+    };
+    queue: string;
+  }) {
+    const queueName = data.queue;
+    const message = data.data;
+
     try {
       const connection = await amqp.connect(this.url);
       const channel = await connection.createChannel();

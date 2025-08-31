@@ -8,6 +8,7 @@ import { NotificationModule } from './email-notification/notification.module';
 import { UserModule } from './web/user/module/user.module';
 import { ReviewModule } from './web/review/module/review.module';
 import { ConfigModule } from '@nestjs/config';
+import { BookingModule } from './web/booking/module/booking.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     NotificationModule,
     UserModule,
+    BookingModule,
     ReviewModule,
   ],
 })

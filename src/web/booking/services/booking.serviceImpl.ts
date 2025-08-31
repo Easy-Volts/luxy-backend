@@ -15,12 +15,15 @@ import { apiResponse } from 'src/commons/utils/mapper';
 import { CarLending } from 'src/domain/entities/car.lending.model';
 import { BookingStatus, PaymentStatus } from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
+import { PaymentGatewayService } from 'src/payment/services/payment.gateway';
+import { PaymentInitResponse } from 'src/dtos/payment-init-response.dto';
 @Injectable()
 export class BookingServiceImpl implements BookingService {
   constructor(
     private readonly bookingRepository: CarLendingRepository,
     private readonly carRepository: CarRepository,
     private readonly customerRepository: CustomerRepository,
+    private readonly paymentService: PaymentGatewayService,
     private readonly logger: CustomLogger,
   ) {
     this.logger.setContext(BookingServiceImpl.name);
@@ -90,7 +93,7 @@ export class BookingServiceImpl implements BookingService {
     const subtotal = pricePerDay * totalDays;
     const taxRate = 0.075; // 7.5% tax
     const taxAmount = subtotal * taxRate;
-    const totalAmount = subtotal + taxAmount;
+    const totalAmount = Math.round((subtotal + taxAmount) * 100);
 
     // Generate booking reference
     const bookingReference = this.generateBookingReference();
@@ -116,11 +119,22 @@ export class BookingServiceImpl implements BookingService {
     booking.returnLocation = dto.returnLocation;
 
     const savedBooking = await this.bookingRepository.saveBooking(booking);
-    const responseData = this.mapToBookingResponse(savedBooking);
+    const payload = {
+      amount: totalAmount,
+      email: user.sub,
+      username: user.username,
+      currency: 'NGN',
+      bookingReference,
+    };
+    const response = await this.paymentService.processPayment(payload);
+    const responseData = this.mapToBookingResponsePayemnt(
+      savedBooking,
+      response,
+    );
 
     this.logger.log(`Booking created successfully: ${bookingReference}`);
 
-    return apiResponse(true, 'Booking created successfully', responseData);
+    return apiResponse('Booking created successfully', responseData);
   }
 
   async getCustomerBookings(
@@ -140,7 +154,7 @@ export class BookingServiceImpl implements BookingService {
       this.mapToBookingResponse(booking),
     );
 
-    return apiResponse(true, 'Bookings retrieved successfully', responseData);
+    return apiResponse('Bookings retrieved successfully', responseData);
   }
 
   async getAllBookings(): Promise<ApiResponses<BookingResponseDto[]>> {
@@ -151,11 +165,7 @@ export class BookingServiceImpl implements BookingService {
       this.mapToBookingResponse(booking),
     );
 
-    return apiResponse(
-      true,
-      'All bookings retrieved successfully',
-      responseData,
-    );
+    return apiResponse('All bookings retrieved successfully', responseData);
   }
 
   private generateBookingReference(): string {
@@ -169,6 +179,44 @@ export class BookingServiceImpl implements BookingService {
 
   private mapToBookingResponse(booking: CarLending): BookingResponseDto {
     return {
+      paymentInitResponse: null!,
+      id: booking.id,
+      bookingReference: booking.bookingReference,
+      carId: booking.carId,
+      carDetails: booking.car
+        ? {
+            make: booking.car.make,
+            model: booking.car.model,
+            year: booking.car.year,
+            color: booking.car.color,
+            licensePlate: booking.car.licensePlate,
+            brand: booking.car.brand
+              ? {
+                  name: booking.car.brand.name,
+                  image: booking.car.brand.image,
+                }
+              : undefined,
+          }
+        : undefined,
+      startDate: booking.startDate.toISOString().split('T')[0],
+      endDate: booking.endDate.toISOString().split('T')[0],
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      totalDays: booking.totalDays,
+      pricePerDay: Number(booking.pricePerDay),
+      totalAmount: Number(booking.totalAmount),
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+      paymentMethod: booking.paymentMethod,
+      createdAt: booking.createdAt,
+    };
+  }
+  private mapToBookingResponsePayemnt(
+    booking: CarLending,
+    paymentInitResponse: PaymentInitResponse,
+  ): BookingResponseDto {
+    return {
+      paymentInitResponse: paymentInitResponse,
       id: booking.id,
       bookingReference: booking.bookingReference,
       carId: booking.carId,

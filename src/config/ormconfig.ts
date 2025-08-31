@@ -7,6 +7,7 @@ import { Car } from 'src/domain/entities/car.model';
 import { Brand } from 'src/domain/entities/brand.model';
 import { Vendor } from 'src/domain/entities/vendor.model';
 import * as dotenv from 'dotenv';
+import { CarLending } from 'src/domain/entities/car.lending.model';
 
 dotenv.config();
 export const ormconfig: TypeOrmModule = {
@@ -16,6 +17,6 @@ export const ormconfig: TypeOrmModule = {
   username: process.env.DB_USERNAME ?? 'root',
   password: process.env.DB_PASS ?? '',
   database: process.env.DB_NAME,
-  entities: [Users, Customer, Wallet, Review, Car, Brand, Vendor],
+  entities: [Users, Customer, Wallet, Review, Car, Brand, Vendor, CarLending],
   synchronize: true,
 };
