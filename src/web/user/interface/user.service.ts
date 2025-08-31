@@ -1,9 +1,17 @@
-import { ApiResponses } from 'src/dtos/response';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
-export const USER_SERVICE = Symbol('USER_SERVICE');
+import { UpdateProfileDto } from '../../../dtos/update.profile.dto';
+import { ApiResponses } from 'src/dtos/response';
+
 export interface UserService {
   updateUserLocation(
-    userId: number,
+    userContext: { id: number },
     dto: UpdateLocationDto,
   ): Promise<ApiResponses<any>>;
+
+  updateUserProfile(
+    userContext: { id: number },
+    dto: UpdateProfileDto,
+  ): Promise<ApiResponses<any>>;
 }
+
+export const USER_SERVICE = 'USER_SERVICE';
