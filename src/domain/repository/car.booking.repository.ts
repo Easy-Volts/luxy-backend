@@ -37,6 +37,32 @@ export class CarLendingRepository {
     });
   }
 
+  async findByCustomerIdWithPagination(
+    customerId: number,
+    options: {
+      status?: string;
+      page?: number;
+      limit?: number;
+    } = {}
+  ): Promise<[CarLending[], number]> {
+    const where: any = { customerId };
+    if (options.status) {
+      where.status = options.status;
+    }
+    
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 10;
+    const skip = (page - 1) * limit;
+
+    return this.bookingRepository.findAndCount({
+      where,
+      relations: ['customer', 'car', 'car.brand'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+  }
+
   async findByCarId(carId: number): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: { carId },

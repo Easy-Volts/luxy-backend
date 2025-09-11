@@ -139,6 +139,7 @@ export class BookingServiceImpl implements BookingService {
 
   async getCustomerBookings(
     user: UserDetails,
+    options?: { status?: string; page?: number; limit?: number }
   ): Promise<ApiResponses<BookingResponseDto[]>> {
     this.logger.log(`Fetching bookings for customer ${user.username}`);
 
@@ -147,14 +148,23 @@ export class BookingServiceImpl implements BookingService {
       throw new NotFoundException('Customer not found');
     }
 
-    const bookings = await this.bookingRepository.findByCustomerId(
+    const [bookings, total] = await this.bookingRepository.findByCustomerIdWithPagination(
       customer.id!,
+      options || {}
     );
+
     const responseData = bookings.map((booking) =>
       this.mapToBookingResponse(booking),
     );
 
-    return apiResponse('Bookings retrieved successfully', responseData);
+    const response = apiResponse('Bookings retrieved successfully', responseData);
+    response.meta = { 
+      total, 
+      page: options?.page ?? 1, 
+      limit: options?.limit ?? 10 
+    };
+    
+    return response;
   }
 
   async getAllBookings(): Promise<ApiResponses<BookingResponseDto[]>> {
