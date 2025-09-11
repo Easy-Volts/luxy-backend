@@ -5,6 +5,7 @@ import { USER_SERVICE } from '../interface/user.service'; // adjust path if need
 import { UserServiceImpl } from '../services/user.serviceImp';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { AuthGuard } from 'src/commons/security/guard';
+import { AccountStatusGuard } from 'src/commons/security/account-status.guard';
 import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { SharedModule } from 'src/shared/shared.module';
     },
     RolesGuard,
     AuthGuard,
+    AccountStatusGuard,
   ],
 })
 export class UserModule {}
