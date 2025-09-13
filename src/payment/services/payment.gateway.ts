@@ -66,17 +66,17 @@ export class PaymentGatewayService {
           headers: { Authorization: `Bearer ${this.secretKey}` },
         });
 
-      const data = response.data.data;
+      const data = response.data.data as PaymentVerifyResponse;
       return {
         status: data.status,
         reference: data.reference,
         amount: data.amount / 100,
-        paidAt: new Date(data.paid_at),
+        paidAt: new Date(data.paidAt),
         channel: data.channel,
         currency: data.currency,
         customer: {
           email: data.customer.email,
-          username: data.metadata?.username,
+          username: data.customer?.username,
         },
       };
     } catch (err: unknown) {
