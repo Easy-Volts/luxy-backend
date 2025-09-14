@@ -1,7 +1,8 @@
 import { CreateDateColumn, Index, UpdateDateColumn } from 'typeorm';
 import { UserType, UserStatus } from 'src/enums/user.enum';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { OneToMany } from 'typeorm';
+import { Pin } from './pin.model';
 @Entity({ name: 'users' })
 export class Users {
   @PrimaryGeneratedColumn({ type: 'bigint' })
@@ -87,4 +88,6 @@ export class Users {
 
   @Column({ nullable: true })
   deviceToken?: string;
+  @OneToMany(() => Pin, (pin) => pin.user)
+  pins!: Pin[];
 }

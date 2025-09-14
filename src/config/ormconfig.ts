@@ -30,4 +30,5 @@ export const ormconfig: TypeOrmModule = {
     Transaction,
   ],
   synchronize: true,
+  autoLoadEntities: true,
 };

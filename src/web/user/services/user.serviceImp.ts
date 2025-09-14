@@ -1,8 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UserRepository } from '../../../domain/repository/user.repository';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
 import { UpdateProfileDto } from '../../../dtos/update.profile.dto';
-import { DeactivateAccountDto, ActivateAccountDto } from '../../../dtos/account.status.dto';
+import {
+  DeactivateAccountDto,
+  ActivateAccountDto,
+} from '../../../dtos/account.status.dto';
 import { UserService } from '../interface/user.service';
 import { ApiResponses, ApiResponseBuilder } from 'src/dtos/response';
 import { UserStatus } from 'src/enums/user.enum';
@@ -69,10 +76,10 @@ export class UserServiceImpl implements UserService {
 
     return new ApiResponseBuilder()
       .setMessage('Account deactivated successfully')
-      .setData({ 
+      .setData({
         status: user.status,
         reason: dto.reason,
-        deactivatedAt: new Date() 
+        deactivatedAt: new Date(),
       })
       .build();
   }
@@ -97,21 +104,23 @@ export class UserServiceImpl implements UserService {
 
     return new ApiResponseBuilder()
       .setMessage('Account activated successfully')
-      .setData({ 
+      .setData({
         status: user.status,
         note: dto.note,
-        activatedAt: new Date() 
+        activatedAt: new Date(),
       })
       .build();
   }
 
-  async getAccountStatus(
-    userContext: { id: number },
-  ): Promise<ApiResponses<any>> {
+  async getAccountStatus(userContext: {
+    id: number;
+  }): Promise<ApiResponses<any>> {
     const user = await this.userRepository.findOneById(userContext.id);
     if (!user) throw new NotFoundException('User not found');
 
-    const canActivate = user.status === UserStatus.INACTIVE || user.status === UserStatus.SUSPENDED;
+    const canActivate =
+      user.status === UserStatus.INACTIVE ||
+      user.status === UserStatus.SUSPENDED;
     const canDeactivate = user.status === UserStatus.ACTIVE;
 
     return new ApiResponseBuilder()
