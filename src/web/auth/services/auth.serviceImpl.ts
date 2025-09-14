@@ -23,12 +23,15 @@ import { ApiResponses } from 'src/dtos/response';
 import { apiResponse, mapperUser } from 'src/commons/utils/mapper';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
+import { Driver } from 'src/domain/entities/driver.model';
+import { DriverRepository } from 'src/domain/repository/driver.repository';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly customerRepository: CustomerRepository,
+    private readonly driverRepository: DriverRepository,
     private readonly logger: CustomLogger,
     private readonly jwtService: JwtService,
     private readonly rabbitMQ: RabbitMQService,
@@ -81,14 +84,23 @@ export class AuthServiceImpl implements AuthService {
       },
       'wallet-queue',
     );
+    if (userType == UserType.CUSTOMER) {
+      const customer = new Customer();
+      customer.userId = savedUser.id;
+      customer.kycVerified = false;
 
-    const customer = new Customer();
-    customer.userId = savedUser.id;
-    customer.kycVerified = false;
+      await this.customerRepository.saveCustomer(customer);
 
-    await this.customerRepository.saveCustomer(customer);
+      this.logger.log(`Customer record created for user ID: ${savedUser.id}`);
+    } else if (userType == UserType.DRIVER) {
+      const driver = new Driver();
+      driver.userId = savedUser.id;
+      driver.kycVerified = false;
 
-    this.logger.log(`Customer record created for user ID: ${savedUser.id}`);
+      await this.driverRepository.saveDriver(driver);
+
+      this.logger.log(`Driver record created for user ID: ${savedUser.id}`);
+    }
 
     return apiResponse('Account created successfully. OTP sent.', {
       id: savedUser.id,

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from 'src/web/auth/controllers/auth.controller';
+import { AuthController } from 'src/web/auth/auth.controller';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
 import { AuthGuard } from 'src/commons/security/guard';
 import { JWTStrategy } from 'src/commons/security/jwt.strategy';

@@ -9,15 +9,23 @@ import { Reflector } from '@nestjs/core';
 import { UserRepository } from 'src/domain/repository/user.repository';
 import { UserStatus } from 'src/enums/user.enum';
 import { SetMetadata } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as dotenv from 'dotenv';
+import { JwtPayload } from 'src/web/auth/interface/jwt-payload.interface';
+import { extractTokenFromHeader } from '../utils/utils';
+import { Request } from 'express';
 
 const ALLOW_INACTIVE_KEY = 'allowInactive';
 export const AllowInactive = () => SetMetadata(ALLOW_INACTIVE_KEY, true);
+dotenv.config();
+const secret: string = process.env.JWT_SECRET ?? 'defaultSecret';
 
 @Injectable()
 export class AccountStatusGuard implements CanActivate {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly reflector: Reflector,
+    private readonly jwtService: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -31,15 +39,23 @@ export class AccountStatusGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const request: Request = context.switchToHttp().getRequest<Request>();
+    const token = extractTokenFromHeader(request);
+    if (!token) {
+      throw new UnauthorizedException('Missing token');
+    }
+    const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+      secret,
+    });
 
-    if (!user || !user.userId) {
+    request['user'] = payload;
+
+    if (!payload || !payload.userId) {
       throw new UnauthorizedException('User not authenticated');
     }
 
-    const userRecord = await this.userRepository.findOneById(user.userId);
-    
+    const userRecord = await this.userRepository.findOneById(payload.userId);
+
     if (!userRecord) {
       throw new UnauthorizedException('User not found');
     }

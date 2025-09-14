@@ -12,10 +12,16 @@ import { USER_SERVICE, UserService } from '../interface/user.service';
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
 import { Users } from '../../../domain/entities/user.model';
 import { UpdateProfileDto } from 'src/dtos/update.profile.dto';
-import { DeactivateAccountDto, ActivateAccountDto } from 'src/dtos/account.status.dto';
+import {
+  DeactivateAccountDto,
+  ActivateAccountDto,
+} from 'src/dtos/account.status.dto';
 import { AuthGuard } from 'src/commons/security/guard';
 import { RolesGuard } from 'src/commons/security/roles.guard';
-import { AccountStatusGuard, AllowInactive } from 'src/commons/security/account-status.guard';
+import {
+  AccountStatusGuard,
+  AllowInactive,
+} from 'src/commons/security/account-status.guard';
 import { UserType } from 'src/enums/user.enum';
 import { Roles } from 'src/commons/decorator/roles.decorator';
 import { Authenticated } from 'src/commons/decorator/auth.decorator';
@@ -88,7 +94,7 @@ export class UserController {
     status: 400,
     description: 'Account is already active or cannot be activated',
   })
-  async activateAccount(
+  activateAccount(
     @CurrentUser() user: { id: number },
     @Body() dto: ActivateAccountDto,
   ): Promise<ApiResponses<any>> {
@@ -102,7 +108,7 @@ export class UserController {
     status: 200,
     description: 'Account status retrieved successfully',
   })
-  async getAccountStatus(
+  getAccountStatus(
     @CurrentUser() user: { id: number },
   ): Promise<ApiResponses<any>> {
     return this.userService.getAccountStatus(user);

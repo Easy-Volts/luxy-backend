@@ -43,13 +43,13 @@ export class CarLendingRepository {
       status?: string;
       page?: number;
       limit?: number;
-    } = {}
+    } = {},
   ): Promise<[CarLending[], number]> {
     const where: any = { customerId };
     if (options.status) {
       where.status = options.status;
     }
-    
+
     const page = options.page ?? 1;
     const limit = options.limit ?? 10;
     const skip = (page - 1) * limit;

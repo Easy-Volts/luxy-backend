@@ -2,7 +2,7 @@ import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ApiResponses } from 'src/dtos/response';
 import { LoginDto } from 'src/dtos/user.auth.dto';
 import { CreateAccountDto } from 'src/dtos/user.createdto';
-import { AUTH_SERVICE, AuthService } from '../interface/auth.service';
+import { AUTH_SERVICE, AuthService } from './interface/auth.service';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { ApiOperation, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';

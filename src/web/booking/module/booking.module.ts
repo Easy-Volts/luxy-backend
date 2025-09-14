@@ -21,11 +21,11 @@ import { SharedModule } from 'src/shared/shared.module';
     },
     CarLendingRepository,
     CarRepository,
+
     PaymentGatewayService,
     AxiosConfig,
     RolesGuard,
     AuthGuard,
   ],
-  // exports: [BOOKING_SERVICE, CarLendingRepository],
 })
 export class BookingModule {}

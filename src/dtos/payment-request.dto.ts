@@ -4,4 +4,5 @@ export class PaymentRequestDto {
   email?: string;
   username?: string;
   source?: string;
+  userId!: number;
 }

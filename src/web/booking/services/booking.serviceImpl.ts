@@ -89,14 +89,25 @@ export class BookingServiceImpl implements BookingService {
     const totalDays = Math.ceil(
       (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
+    this.logger.log('Days' + totalDays);
     const pricePerDay = Number(car.price);
     const subtotal = pricePerDay * totalDays;
+
     const taxRate = 0.075; // 7.5% tax
     const taxAmount = subtotal * taxRate;
-    const totalAmount = Math.round((subtotal + taxAmount) * 100);
+    const totalAmount = subtotal + taxAmount;
 
-    // Generate booking reference
-    const bookingReference = this.generateBookingReference();
+    let bookingReference: string = '';
+    let isUnique = false;
+
+    while (!isUnique) {
+      bookingReference = this.generateBookingReference();
+      const existing =
+        await this.bookingRepository.findByReference(bookingReference);
+      if (!existing) {
+        isUnique = true;
+      }
+    }
 
     // Create booking
     const booking = new CarLending();
@@ -124,7 +135,8 @@ export class BookingServiceImpl implements BookingService {
       email: user.sub,
       username: user.username,
       currency: 'NGN',
-      bookingReference,
+      source: bookingReference,
+      userId: user.userId,
     };
     const response = await this.paymentService.processPayment(payload);
     const responseData = this.mapToBookingResponsePayemnt(
@@ -139,7 +151,7 @@ export class BookingServiceImpl implements BookingService {
 
   async getCustomerBookings(
     user: UserDetails,
-    options?: { status?: string; page?: number; limit?: number }
+    options?: { status?: string; page?: number; limit?: number },
   ): Promise<ApiResponses<BookingResponseDto[]>> {
     this.logger.log(`Fetching bookings for customer ${user.username}`);
 
@@ -148,22 +160,26 @@ export class BookingServiceImpl implements BookingService {
       throw new NotFoundException('Customer not found');
     }
 
-    const [bookings, total] = await this.bookingRepository.findByCustomerIdWithPagination(
-      customer.id!,
-      options || {}
-    );
+    const [bookings, total] =
+      await this.bookingRepository.findByCustomerIdWithPagination(
+        customer.id!,
+        options || {},
+      );
 
     const responseData = bookings.map((booking) =>
       this.mapToBookingResponse(booking),
     );
 
-    const response = apiResponse('Bookings retrieved successfully', responseData);
-    response.meta = { 
-      total, 
-      page: options?.page ?? 1, 
-      limit: options?.limit ?? 10 
+    const response = apiResponse(
+      'Bookings retrieved successfully',
+      responseData,
+    );
+    response.meta = {
+      total,
+      page: options?.page ?? 1,
+      limit: options?.limit ?? 10,
     };
-    
+
     return response;
   }
 

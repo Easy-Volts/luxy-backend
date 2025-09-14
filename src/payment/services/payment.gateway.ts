@@ -7,6 +7,9 @@ import { PaymentVerifyResponse } from 'src/dtos/payment-verify-response.dto';
 import { AxiosConfig } from 'src/config/axios.config';
 import { CustomLogger } from 'src/log/logs.service';
 import { AxiosError } from 'axios';
+import { Transaction } from 'src/domain/entities/transaction.model';
+import { PaymentMethod } from 'src/enums/user.enum';
+import { TransactionRepository } from 'src/domain/repository/transaction.repository';
 
 @Injectable()
 export class PaymentGatewayService {
@@ -15,6 +18,7 @@ export class PaymentGatewayService {
   constructor(
     private readonly logger: CustomLogger,
     private readonly axiosConfig: AxiosConfig,
+    private readonly transactionRepository: TransactionRepository,
   ) {
     this.logger.setContext(PaymentGatewayService.name);
     this.secretKey = process.env.PAYSTACK_SECRET_KEY ?? '';
@@ -40,8 +44,19 @@ export class PaymentGatewayService {
           headers: { Authorization: `Bearer ${this.secretKey}` },
         },
       );
+      this.logger.log('Payment:: Code ' + JSON.stringify(response.data.data));
 
       const { authorization_url, access_code, reference } = response.data.data;
+      const transaction = new Transaction();
+      transaction.amount = data.amount;
+      transaction.userId = data.userId;
+      transaction.dateCreated = new Date();
+      transaction.paymentType = PaymentMethod.BANK_TRANSFER;
+      transaction.status = 'PENDING';
+      transaction.reefrence = reference;
+      transaction.code = data.source!;
+      await this.transactionRepository.savetransaction(transaction);
+
       return { authorization_url, access_code, reference };
     } catch (err: unknown) {
       const error = err as AxiosError;
@@ -51,6 +66,15 @@ export class PaymentGatewayService {
           ? JSON.stringify(error.response.data)
           : error.message,
       );
+      const transaction = new Transaction();
+      transaction.amount = data.amount;
+      transaction.userId = data.userId;
+      transaction.dateCreated = new Date();
+      transaction.paymentType = PaymentMethod.BANK_TRANSFER;
+      transaction.status = 'FAILED';
+      transaction.reefrence = undefined;
+      transaction.code = data.source!;
+      await this.transactionRepository.savetransaction(transaction);
       throw new HttpException(
         'Unable to initialize payment',
         HttpStatus.BAD_REQUEST,
