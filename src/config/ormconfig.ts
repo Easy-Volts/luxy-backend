@@ -19,4 +19,5 @@ export const ormconfig: TypeOrmModule = {
   database: process.env.DB_NAME,
   entities: [Users, Customer, Wallet, Review, Car, Brand, Vendor, CarLending],
   synchronize: true,
+  autoLoadEntities: true,
 };
