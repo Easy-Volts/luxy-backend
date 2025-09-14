@@ -1,6 +1,9 @@
 import { UpdateLocationDto } from '../../../dtos/update.location.dto';
 import { UpdateProfileDto } from '../../../dtos/update.profile.dto';
-import { DeactivateAccountDto, ActivateAccountDto } from '../../../dtos/account.status.dto';
+import {
+  DeactivateAccountDto,
+  ActivateAccountDto,
+} from '../../../dtos/account.status.dto';
 import { ApiResponses } from 'src/dtos/response';
 
 export interface UserService {
@@ -24,9 +27,7 @@ export interface UserService {
     dto: ActivateAccountDto,
   ): Promise<ApiResponses<any>>;
 
-  getAccountStatus(
-    userContext: { id: number },
-  ): Promise<ApiResponses<any>>;
+  getAccountStatus(userContext: { id: number }): Promise<ApiResponses<any>>;
 }
 
 export const USER_SERVICE = 'USER_SERVICE';

@@ -7,19 +7,22 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Users } from './user.model';
+import { Users } from '../entities/user.model';
 
 @Entity({ name: 'pins' })
 export class Pin {
   @PrimaryGeneratedColumn({ type: 'bigint' })
-  id?: number;
+  id!: number;
 
-  @ManyToOne(() => Users, (user) => user.id, { onDelete: 'CASCADE' })
+  @Column({ name: 'userId', type: 'bigint' })
+  userId!: number;
+
+  @ManyToOne(() => Users, (user) => user.pins, {
+    onDelete: 'CASCADE',
+    eager: false,
+  })
   @JoinColumn({ name: 'userId' })
   user!: Users;
-
-  @Column({ type: 'bigint' })
-  userId!: number;
 
   @Column({ type: 'text' })
   hashedPin!: string;
@@ -27,9 +30,15 @@ export class Pin {
   @Column({ default: false })
   isResetRequired!: boolean;
 
+  @Column({ default: 0 })
+  attemptCount!: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastAttemptAt!: Date | null;
+
   @CreateDateColumn()
-  createdAt?: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt?: Date;
+  updatedAt!: Date;
 }
