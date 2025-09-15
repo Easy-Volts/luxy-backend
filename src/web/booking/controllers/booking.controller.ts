@@ -55,6 +55,10 @@ export class BookingController {
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10
   ): Promise<ApiResponses<BookingResponseDto[]>> {
-    return this.bookingService.getCustomerBookings(currentUser,);
+    return this.bookingService.getCustomerBookings(currentUser, {
+      status,
+      page,
+      limit
+    });
   }
 }
