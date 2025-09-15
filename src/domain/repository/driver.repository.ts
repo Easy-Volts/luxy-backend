@@ -1,28 +1,19 @@
+// src/domain/repository/driver.repository.ts
+import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Driver } from '../entities/driver.model';
 
 @Injectable()
-export class DriverRepository {
-  constructor(
-    @InjectRepository(Driver)
-    private DriverRepository: Repository<Driver>,
-  ) {}
-
-  async saveDriver(Driver: Driver): Promise<Driver> {
-    return this.DriverRepository.save(Driver);
-  }
-
-  async findOneByUserId(userId: number): Promise<Driver | null> {
-    return this.DriverRepository.findOne({ where: { userId } });
-  }
-
-  async findAll(): Promise<Driver[]> {
-    return this.DriverRepository.find();
+export class DriverRepository extends Repository<Driver> {
+  constructor(private dataSource: DataSource) {
+    super(Driver, dataSource.createEntityManager());
   }
 
   async findOneById(id: number): Promise<Driver | null> {
-    return this.DriverRepository.findOne({ where: { id } });
+    return this.findOne({ where: { id } });
+  }
+
+  async saveDriver(driver: Driver): Promise<Driver> {
+    return this.save(driver);
   }
 }

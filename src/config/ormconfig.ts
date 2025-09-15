@@ -9,6 +9,7 @@ import { Vendor } from 'src/domain/entities/vendor.model';
 import * as dotenv from 'dotenv';
 import { CarLending } from 'src/domain/entities/car.lending.model';
 import { Transaction } from 'src/domain/entities/transaction.model';
+import { Driver } from 'src/domain/entities/driver.model';
 
 dotenv.config();
 export const ormconfig: TypeOrmModule = {
@@ -28,6 +29,7 @@ export const ormconfig: TypeOrmModule = {
     Vendor,
     CarLending,
     Transaction,
+    Driver,
   ],
   synchronize: true,
   autoLoadEntities: true,

@@ -1,3 +1,6 @@
-export const DRIVER_SERVICE = Symbol('DRIVER_SERVICE');
+// export const DRIVER_SERVICE = Symbol('DRIVER_SERVICE');
 
-export type DriverService = object;
+// export interface DriverService {
+//   // Define methods for the DriverService interface here
+//   deleteDriver(driverId: number): Promise<void>;
+// }
