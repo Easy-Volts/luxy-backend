@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
@@ -25,6 +27,13 @@ export class CarLendingRepository {
   async findByReference(reference: string): Promise<CarLending | null> {
     return this.bookingRepository.findOne({
       where: { bookingReference: reference },
+      relations: ['customer', 'car', 'car.brand'],
+    });
+  }
+
+  async findByCode(bookingCode: string): Promise<CarLending | null> {
+    return this.bookingRepository.findOne({
+      where: { bookingCode: bookingCode },
       relations: ['customer', 'car', 'car.brand'],
     });
   }

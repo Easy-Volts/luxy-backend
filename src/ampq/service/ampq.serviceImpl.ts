@@ -100,13 +100,13 @@ export class ListenerServiceImpl {
                 wallet.status = 'ACTIVE';
                 // generate wallet
 
-                let accountNumber: number = 0;
+                let accountNumber: string = '0';
                 let isUnique = false;
 
                 while (!isUnique) {
                   accountNumber = Math.floor(
                     1000000000 + Math.random() * 9000000000,
-                  ); // 10-digit number
+                  ).toString(); // 10-digit number
                   const existingWallet =
                     await this.walletRepository.findByWalletAccount(
                       accountNumber,

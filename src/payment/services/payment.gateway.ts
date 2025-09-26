@@ -66,15 +66,6 @@ export class PaymentGatewayService {
           ? JSON.stringify(error.response.data)
           : error.message,
       );
-      const transaction = new Transaction();
-      transaction.amount = data.amount;
-      transaction.userId = data.userId;
-      transaction.dateCreated = new Date();
-      transaction.paymentType = PaymentMethod.BANK_TRANSFER;
-      transaction.status = 'FAILED';
-      transaction.reefrence = undefined;
-      transaction.code = data.source!;
-      await this.transactionRepository.savetransaction(transaction);
       throw new HttpException(
         'Unable to initialize payment',
         HttpStatus.BAD_REQUEST,

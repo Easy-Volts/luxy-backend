@@ -65,6 +65,7 @@ export class BookingResponseDto {
   paymentInitResponse!: PaymentInitResponse;
   id?: number;
   bookingReference!: string;
+  bookingCode!: string;
   carId!: number;
   carDetails?: {
     make: string;

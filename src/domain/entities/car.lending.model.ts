@@ -23,6 +23,9 @@ export class CarLending {
   @Column({ type: 'varchar', length: 50, unique: true })
   bookingReference!: string;
 
+  @Column({ type: 'varchar', length: 4, unique: true })
+  bookingCode!: string;
+
   @Column({ type: 'bigint' })
   customerId!: number;
 

@@ -12,6 +12,7 @@ import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 import { ListenerServiceImpl } from 'src/ampq/service/ampq.serviceImpl';
 import { SharedModule } from 'src/shared/shared.module';
 import { DriverRepository } from 'src/domain/repository/driver.repository';
+import { VendorRepository } from 'src/domain/repository/vendor.repository';
 dotenv.config();
 const secret = process.env.JWT_SECRET ?? 'defaultSecret';
 @Module({
@@ -36,6 +37,7 @@ const secret = process.env.JWT_SECRET ?? 'defaultSecret';
     RabbitMQService,
     DriverRepository,
     CustomerRepository,
+    VendorRepository,
     WalletRepository,
     JWTStrategy,
     AuthGuard,

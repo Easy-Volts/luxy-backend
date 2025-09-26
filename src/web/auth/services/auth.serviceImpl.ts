@@ -25,6 +25,8 @@ import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { RabbitMQService } from 'src/ampq/service/rabbitMQ';
 import { Driver } from 'src/domain/entities/driver.model';
 import { DriverRepository } from 'src/domain/repository/driver.repository';
+import { Vendor } from 'src/domain/entities/vendor.model';
+import { VendorRepository } from 'src/domain/repository/vendor.repository';
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -32,6 +34,7 @@ export class AuthServiceImpl implements AuthService {
     private readonly userRepository: UserRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly driverRepository: DriverRepository,
+    private readonly vendorRepository: VendorRepository,
     private readonly logger: CustomLogger,
     private readonly jwtService: JwtService,
     private readonly rabbitMQ: RabbitMQService,
@@ -100,6 +103,14 @@ export class AuthServiceImpl implements AuthService {
       await this.driverRepository.saveDriver(driver);
 
       this.logger.log(`Driver record created for user ID: ${savedUser.id}`);
+    } else if (userType == UserType.VENDOR) {
+      const vendor = new Vendor();
+      vendor.userId = savedUser.id;
+      vendor.kycVerified = false;
+
+      await this.vendorRepository.saveVendor(vendor);
+
+      this.logger.log(`Vendor record created for user ID: ${savedUser.id}`);
     }
 
     return apiResponse('Account created successfully. OTP sent.', {

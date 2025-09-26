@@ -10,6 +10,7 @@ import { PinModule } from './web/pin/module/pin.module';
 import { ReviewModule } from './web/review/module/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { BookingModule } from './web/booking/module/booking.module';
+import { PaymentModule } from './payment/module/payment.module';
 // import { DriverModule } from './web/drivers/module/driver.module';
 
 @Module({
@@ -22,13 +23,14 @@ import { BookingModule } from './web/booking/module/booking.module';
       useFactory: () => ormconfig,
     }),
     LoggerModule,
-    AuthModule,
-    // DriverModule,
     NotificationModule,
     UserModule,
     BookingModule,
     ReviewModule,
     PinModule,
+    PaymentModule,
+    AuthModule,
+
   ],
 })
 export class AppModule {

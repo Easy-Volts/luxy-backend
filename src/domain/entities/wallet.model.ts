@@ -23,8 +23,8 @@ export class Wallet {
   @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
   status!: string;
 
-  @Column({ type: 'bigint' })
-  accountNumber?: number;
+  @Column({ type: 'varchar' })
+  accountNumber?: string;
 
   @CreateDateColumn()
   createdAt?: Date;

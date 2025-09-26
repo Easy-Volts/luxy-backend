@@ -109,9 +109,21 @@ export class BookingServiceImpl implements BookingService {
       }
     }
 
+    let bookingCode: string = '';
+    let isUniqueCode = false;
+
+    while (!isUniqueCode) {
+      bookingCode = this.generateBookingCode();
+      const existingCode = await this.bookingRepository.findByCode(bookingCode);
+      if (!existingCode) {
+        isUniqueCode = true;
+      }
+    }
+
     // Create booking
     const booking = new CarLending();
     booking.bookingReference = bookingReference;
+    booking.bookingCode = bookingCode;
     booking.customerId = customer.id!;
     booking.carId = dto.carId;
     booking.startDate = startDate;
@@ -130,8 +142,10 @@ export class BookingServiceImpl implements BookingService {
     booking.returnLocation = dto.returnLocation;
 
     const savedBooking = await this.bookingRepository.saveBooking(booking);
+    const amount = Math.ceil(totalAmount);
+    console.log(amount);
     const payload = {
-      amount: totalAmount,
+      amount: amount,
       email: user.sub,
       username: user.username,
       currency: 'NGN',
@@ -203,11 +217,20 @@ export class BookingServiceImpl implements BookingService {
     return `${prefix}${timestamp.slice(-8)}${random}`;
   }
 
+  private generateBookingCode(): string {
+    const code = Math.floor(1000000000 + Math.random() * 9000000000)
+      .toString()
+      .substring(0, 4);
+    this.logger.log('code :: ' + code);
+    return `${code}`;
+  }
+
   private mapToBookingResponse(booking: CarLending): BookingResponseDto {
     return {
       paymentInitResponse: null!,
       id: booking.id,
       bookingReference: booking.bookingReference,
+      bookingCode: booking.bookingCode,
       carId: booking.carId,
       carDetails: booking.car
         ? {
@@ -245,6 +268,7 @@ export class BookingServiceImpl implements BookingService {
       paymentInitResponse: paymentInitResponse,
       id: booking.id,
       bookingReference: booking.bookingReference,
+      bookingCode: booking.bookingCode,
       carId: booking.carId,
       carDetails: booking.car
         ? {
