@@ -4,11 +4,11 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PaymentInitResponse } from 'src/dtos/payment-init-response.dto';
 import { PaymentRequestDto } from 'src/dtos/payment-request.dto';
 import { PaymentVerifyResponse } from 'src/dtos/payment-verify-response.dto';
+import { FundWalletRequestDto } from 'src/dtos/fund-wallet-request.dto';
 import { AxiosConfig } from 'src/config/axios.config';
 import { CustomLogger } from 'src/log/logs.service';
 import { AxiosError } from 'axios';
 import { Transaction } from 'src/domain/entities/transaction.model';
-import { PaymentMethod } from 'src/enums/user.enum';
 import { TransactionRepository } from 'src/domain/repository/transaction.repository';
 
 @Injectable()
@@ -26,23 +26,20 @@ export class PaymentGatewayService {
 
   async processPayment(data: PaymentRequestDto): Promise<PaymentInitResponse> {
     try {
-      this.logger.log(
-        `Initializing payment for ${data.email}, amount: ${data.amount}`,
-      );
-      const response = await this.axiosConfig.getHttpClient().post(
-        '/transaction/initialize',
-        {
-          amount: data.amount * 100,
-          email: data.email,
-          currency: data.currency || 'NGN',
-          metadata: {
-            username: data.username,
-            source: data.source,
-          },
+      const req: FundWalletRequestDto = {
+        amount: data.amount,
+        email: data.email!,
+        currency: data.currency,
+        metadata: {
+          username: data.username,
+          source: data.source,
         },
-        {
-          headers: { Authorization: `Bearer ${this.secretKey}` },
-        },
+      };
+
+      const response = await this.processPayStackInitialization(
+        req,
+        data.userId,
+        data.paymentMethod!,
       );
       this.logger.log('Payment:: Code ' + JSON.stringify(response.data.data));
 
@@ -51,7 +48,7 @@ export class PaymentGatewayService {
       transaction.amount = data.amount;
       transaction.userId = data.userId;
       transaction.dateCreated = new Date();
-      transaction.paymentType = PaymentMethod.BANK_TRANSFER;
+      transaction.paymentType = data.paymentMethod;
       transaction.status = 'PENDING';
       transaction.reefrence = reference;
       transaction.code = data.source!;
@@ -136,5 +133,84 @@ export class PaymentGatewayService {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async initiateFundWallet(
+    data: FundWalletRequestDto,
+    userId: number,
+  ): Promise<PaymentInitResponse> {
+    try {
+      const response = await this.processPayStackInitialization(
+        data,
+        userId,
+        'wallet_funding',
+      );
+
+      const { authorization_url, access_code, reference } = response.data.data;
+
+      // Create transaction record
+      const transaction = new Transaction();
+      transaction.amount = data.amount;
+      transaction.userId = userId;
+      transaction.dateCreated = new Date();
+      transaction.paymentType = data.paymentMethod;
+      transaction.status = 'PENDING';
+      transaction.reefrence = reference;
+      transaction.code = 'WALLET_FUNDING';
+      await this.transactionRepository.savetransaction(transaction);
+
+      return { authorization_url, access_code, reference };
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      this.logger.error(
+        'Wallet funding initialization failed',
+        error.response?.data
+          ? JSON.stringify(error.response.data)
+          : error.message,
+      );
+
+      // Create failed transaction record
+      const transaction = new Transaction();
+      transaction.amount = data.amount;
+      transaction.userId = userId;
+      transaction.dateCreated = new Date();
+      transaction.paymentType = data.paymentMethod;
+      transaction.status = 'FAILED';
+      transaction.reefrence = undefined;
+      transaction.code = 'WALLET_FUNDING';
+      await this.transactionRepository.savetransaction(transaction);
+
+      throw new HttpException(
+        'Unable to initialize wallet funding',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async processPayStackInitialization(
+    data: FundWalletRequestDto,
+    userId: number,
+    transactionType: string,
+  ) {
+    this.logger.log(
+      `Initializing payment for ${data.email}, amount: ${data.amount}`,
+    );
+    return this.axiosConfig.getHttpClient().post(
+      '/transaction/initialize',
+      {
+        amount: data.amount * 100, // Convert to kobo
+        email: data.email,
+        currency: data.currency || 'NGN',
+        callback_url: data.callback_url,
+        metadata: {
+          ...data.metadata,
+          transaction_type: transactionType,
+          user_id: userId,
+        },
+      },
+      {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      },
+    );
   }
 }

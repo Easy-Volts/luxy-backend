@@ -1,3 +1,5 @@
+import { PaymentMethod } from 'src/enums/user.enum';
+
 export class PaymentRequestDto {
   amount!: number;
   currency?: string;
@@ -5,4 +7,5 @@ export class PaymentRequestDto {
   username?: string;
   source?: string;
   userId!: number;
+  paymentMethod?: PaymentMethod;
 }

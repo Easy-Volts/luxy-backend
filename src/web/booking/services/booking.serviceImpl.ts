@@ -13,7 +13,11 @@ import { CreateBookingDto, BookingResponseDto } from 'src/dtos/booking.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { apiResponse } from 'src/commons/utils/mapper';
 import { CarLending } from 'src/domain/entities/car.lending.model';
-import { BookingStatus, PaymentStatus } from 'src/enums/user.enum';
+import {
+  BookingStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 import { PaymentGatewayService } from 'src/payment/services/payment.gateway';
 import { PaymentInitResponse } from 'src/dtos/payment-init-response.dto';
@@ -143,7 +147,6 @@ export class BookingServiceImpl implements BookingService {
 
     const savedBooking = await this.bookingRepository.saveBooking(booking);
     const amount = Math.ceil(totalAmount);
-    console.log(amount);
     const payload = {
       amount: amount,
       email: user.sub,
@@ -151,6 +154,7 @@ export class BookingServiceImpl implements BookingService {
       currency: 'NGN',
       source: bookingReference,
       userId: user.userId,
+      paymentMethod: dto.paymentMethod || PaymentMethod.BANK_TRANSFER,
     };
     const response = await this.paymentService.processPayment(payload);
     const responseData = this.mapToBookingResponsePayemnt(
