@@ -27,10 +27,7 @@ import { Driver } from 'src/domain/entities/driver.model';
 import { DriverRepository } from 'src/domain/repository/driver.repository';
 import { Vendor } from 'src/domain/entities/vendor.model';
 import { VendorRepository } from 'src/domain/repository/vendor.repository';
-import {
-  DriverRegistrationDto,
-  DriverLoginDto,
-} from 'src/dtos/driver.auth.dto';
+// ...existing code...
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -229,120 +226,5 @@ export class AuthServiceImpl implements AuthService {
     await this.rabbitMQ.sendMessageOTP(payload);
   }
 
-  async registerDriver(
-    dto: DriverRegistrationDto,
-  ): Promise<ApiResponses<any>> {
-    const {
-      email,
-      password,
-      fullName,
-      phone,
-      city = '',
-      state = '',
-      country = '',
-      location = '',
-    } = dto;
-
-    this.logger.log(
-      `Registering driver account: ${JSON.stringify({ email, fullName, phone })}`,
-    );
-
-    const existingUser = await this.userRepository.findOneByEmail(email);
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [firstName, lastName = ''] = fullName.trim().split(' ');
-
-    const user = new Users();
-    user.email = email;
-    user.firstName = firstName;
-    user.lastName = lastName ?? '';
-    user.phone = phone;
-    user.password = hashedPassword;
-    user.city = city ?? '';
-    user.state = state ?? '';
-    user.country = country ?? '';
-    user.userType = UserType.DRIVER;
-
-    const savedUser = await this.userRepository.saveUser(user);
-
-    // Send wallet creation message asynchronously
-    await this.rabbitMQ.sendMessageWallet(
-      {
-        userId: savedUser.id,
-        currency: 'NGN',
-        balance: 0,
-        type: 'WALLET_CREATE',
-      },
-      'wallet-queue',
-    );
-
-    // Create driver profile
-    const driver = new Driver();
-    driver.userId = savedUser.id;
-    driver.kycVerified = false;
-
-    await this.driverRepository.saveDriver(driver);
-
-    this.logger.log(`Driver record created for user ID: ${savedUser.id}`);
-
-    // Generate and send OTP
-    const otp = this.generateOTP(savedUser.email!);
-    savedUser.otpCode = otp;
-    savedUser.otpGeneratedAt = new Date();
-    await this.userRepository.saveUser(savedUser);
-    await this.sendOTPMessage(savedUser.email!, otp);
-
-    return apiResponse('Driver account created successfully. OTP sent.', {
-      id: savedUser.id,
-      fullName,
-      email: savedUser.email,
-    });
-  }
-
-  async loginDriver(dto: DriverLoginDto): Promise<ApiResponses<any>> {
-    const { email, password } = dto;
-
-    this.logger.log(`Driver login attempt for email: ${email}`);
-
-    const user = await this.userRepository.findOneByEmail(email);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Verify user is a driver
-    if (user.userType !== UserType.DRIVER) {
-      throw new UnauthorizedException(
-        'Invalid credentials. This account is not registered as a driver.',
-      );
-    }
-
-    if (user.status === UserStatus.INACTIVE) {
-      throw new BadRequestException(
-        'Account not verified. Please verify your account with OTP.',
-      );
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password!);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
-    const payload = {
-      sub: user.email,
-      username: user.firstName,
-      email: user.email,
-      role: user.userType,
-      appID: 'LUXY-APP',
-      userId: user.id,
-    };
-
-    const token = await this.jwtService.signAsync(payload);
-
-    this.logger.log(`Driver login successful for user ID: ${user.id}`);
-
-    return apiResponse('Driver login successful', mapperUser(user, token));
-  }
+// ...existing code...
 }
