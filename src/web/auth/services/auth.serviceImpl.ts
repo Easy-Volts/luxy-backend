@@ -27,6 +27,7 @@ import { Driver } from 'src/domain/entities/driver.model';
 import { DriverRepository } from 'src/domain/repository/driver.repository';
 import { Vendor } from 'src/domain/entities/vendor.model';
 import { VendorRepository } from 'src/domain/repository/vendor.repository';
+// ...existing code...
 
 @Injectable()
 export class AuthServiceImpl implements AuthService {
@@ -224,4 +225,6 @@ export class AuthServiceImpl implements AuthService {
     };
     await this.rabbitMQ.sendMessageOTP(payload);
   }
+
+// ...existing code...
 }

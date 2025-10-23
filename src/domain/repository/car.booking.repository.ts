@@ -72,6 +72,40 @@ export class CarLendingRepository {
     });
   }
 
+  async findByDriverIdWithPagination(
+    driverId: number,
+    options: {
+      status?: string;
+      page?: number;
+      limit?: number;
+    } = {},
+  ): Promise<[CarLending[], number]> {
+    const queryBuilder = this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.customer', 'customer')
+      .leftJoinAndSelect('booking.car', 'car')
+      .leftJoinAndSelect('car.brand', 'brand')
+      .leftJoinAndSelect('car.vendor', 'vendor')
+      .where('vendor.userId = :driverId', { driverId });
+
+    if (options.status) {
+      queryBuilder.andWhere('booking.status = :status', {
+        status: options.status,
+      });
+    }
+
+    const page = options.page ?? 1;
+    const limit = options.limit ?? 10;
+    const skip = (page - 1) * limit;
+
+    queryBuilder
+      .orderBy('booking.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    return queryBuilder.getManyAndCount();
+  }
+
   async findByCarId(carId: number): Promise<CarLending[]> {
     return this.bookingRepository.find({
       where: { carId },

@@ -6,6 +6,7 @@ import { AUTH_SERVICE, AuthService } from './interface/auth.service';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { ApiOperation, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+// ...existing code...
 
 @ApiTags('Authentication')
 @Controller('api/v1/auth')
@@ -61,4 +62,6 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<ApiResponses<any>> {
     return this.authService.loginUser(loginDto);
   }
+
+// ...existing code...
 }
