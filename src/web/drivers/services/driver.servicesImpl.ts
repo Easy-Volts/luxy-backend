@@ -56,14 +56,6 @@ export class DriverServiceImpl implements DriverService {
     return response;
   }
 
-  async deleteDriver(driverId: number): Promise<void> {
-    const driver = await this.driverRepository.findOneById(driverId);
-    if (!driver) {
-      throw new Error(`Driver with ID ${driverId} not found.`);
-    }
-    await this.driverRepository.remove(driver);
-  }
-
   private mapToBookingResponse(booking: CarLending): BookingResponseDto {
     return {
       paymentInitResponse: null!,

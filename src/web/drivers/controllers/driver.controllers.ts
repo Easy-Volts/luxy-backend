@@ -1,9 +1,7 @@
 import {
   Controller,
-  Delete,
   Get,
   Inject,
-  Param,
   ParseIntPipe,
   Query,
   UseGuards,
@@ -71,10 +69,5 @@ export class DriverController {
       page,
       limit,
     });
-  }
-
-  @Delete(':id')
-  async deleteDriver(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.driverService.deleteDriver(id);
   }
 }

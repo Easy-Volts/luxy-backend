@@ -9,6 +9,4 @@ export interface DriverService {
     user: UserDetails,
     options?: { status?: string; page?: number; limit?: number }
   ): Promise<ApiResponses<BookingResponseDto[]>>;
-
-  deleteDriver(driverId: number): Promise<void>;
 }
