@@ -6,6 +6,10 @@ import { AUTH_SERVICE, AuthService } from './interface/auth.service';
 import { ResendOTPDto } from 'src/dtos/otp.auth.request';
 import { VerifyOTPDto } from 'src/dtos/verify.otp.request';
 import { ApiOperation, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  DriverRegistrationDto,
+  DriverLoginDto,
+} from 'src/dtos/driver.auth.dto';
 
 @ApiTags('Authentication')
 @Controller('api/v1/auth')
@@ -60,5 +64,31 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<ApiResponses<any>> {
     return this.authService.loginUser(loginDto);
+  }
+
+  @ApiOperation({ summary: 'Register driver account successfully' })
+  @ApiBody({ type: DriverRegistrationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver account created successfully',
+  })
+  @Post('driver/register')
+  async registerDriver(
+    @Body() data: DriverRegistrationDto,
+  ): Promise<ApiResponses<any>> {
+    return this.authService.registerDriver(data);
+  }
+
+  @ApiOperation({ summary: 'Driver login successfully' })
+  @ApiBody({ type: DriverLoginDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver login successful',
+  })
+  @Post('driver/login')
+  async loginDriver(
+    @Body() loginDto: DriverLoginDto,
+  ): Promise<ApiResponses<any>> {
+    return this.authService.loginDriver(loginDto);
   }
 }
