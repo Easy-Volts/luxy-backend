@@ -12,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
 import { BookingModule } from './web/booking/module/booking.module';
 import { PaymentModule } from './payment/module/payment.module';
 import { WalletModule } from './web/wallet/module/wallet.module';
-// import { DriverModule } from './web/drivers/module/driver.module';
+import { DriverModule } from './web/drivers/module/driver.module';
 
 @Module({
   imports: [
@@ -32,6 +32,7 @@ import { WalletModule } from './web/wallet/module/wallet.module';
     PaymentModule,
     AuthModule,
     WalletModule,
+    DriverModule,
   ],
 })
 export class AppModule {
