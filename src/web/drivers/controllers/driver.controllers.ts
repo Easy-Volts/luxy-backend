@@ -14,6 +14,7 @@ import { AccountStatusGuard } from 'src/commons/security/account-status.guard';
 import { AuthGuard } from 'src/commons/security/guard';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { BookingResponseDto } from 'src/dtos/booking.dto';
+import { ReviewResponseDto, ReviewStatsDto } from 'src/dtos/review.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { UserType } from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
@@ -69,5 +70,37 @@ export class DriverController {
       page,
       limit,
     });
+  }
+
+  @Get('ratings')
+  @Roles(UserType.DRIVER, UserType.ADMIN)
+  @ApiOperation({
+    summary: 'Get all ratings/reviews for the driver',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver ratings retrieved successfully',
+    type: [ReviewResponseDto],
+  })
+  async getDriverRatings(
+    @CurrentUser() currentUser: UserDetails,
+  ): Promise<ApiResponses<ReviewResponseDto[]>> {
+    return this.driverService.getDriverRatings(currentUser);
+  }
+
+  @Get('ratings/stats')
+  @Roles(UserType.DRIVER, UserType.ADMIN)
+  @ApiOperation({
+    summary: 'Get rating statistics for the driver',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver rating statistics retrieved successfully',
+    type: ReviewStatsDto,
+  })
+  async getDriverRatingStats(
+    @CurrentUser() currentUser: UserDetails,
+  ): Promise<ApiResponses<ReviewStatsDto>> {
+    return this.driverService.getDriverRatingStats(currentUser);
   }
 }
