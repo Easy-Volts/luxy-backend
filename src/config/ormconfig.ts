@@ -1,4 +1,6 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as dotenv from 'dotenv';
+
 import { Customer } from 'src/domain/entities/customer.model';
 import { Users } from 'src/domain/entities/user.model';
 import { Wallet } from 'src/domain/entities/wallet.model';
@@ -6,19 +8,18 @@ import { Review } from 'src/domain/entities/review.model';
 import { Car } from 'src/domain/entities/car.model';
 import { Brand } from 'src/domain/entities/brand.model';
 import { Vendor } from 'src/domain/entities/vendor.model';
-import * as dotenv from 'dotenv';
 import { CarLending } from 'src/domain/entities/car.lending.model';
 import { Transaction } from 'src/domain/entities/transaction.model';
 import { Driver } from 'src/domain/entities/driver.model';
+import { Pin } from 'src/domain/entities/pin.model';
 
 dotenv.config();
-export const ormconfig: TypeOrmModule = {
-  type: process.env.DB_TYPE ?? 'mysql',
-  host: process.env.DB_HOST ?? 'localhost',
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306,
-  username: process.env.DB_USERNAME ?? 'root',
-  password: process.env.DB_PASS ?? '',
-  database: process.env.DB_NAME,
+
+export const ormconfig: TypeOrmModuleOptions = {
+  type: 'postgres',
+  url: process.env.DB_URL,
+  ssl: { rejectUnauthorized: false },
+  synchronize: true,
   entities: [
     Users,
     Customer,
@@ -30,7 +31,6 @@ export const ormconfig: TypeOrmModule = {
     CarLending,
     Transaction,
     Driver,
+    Pin,
   ],
-  synchronize: true,
-  autoLoadEntities: true,
 };

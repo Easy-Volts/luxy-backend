@@ -40,10 +40,10 @@ export class CarLending {
   @JoinColumn({ name: 'carId' })
   car!: Car;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   startDate!: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   endDate!: Date;
 
   @Column({ type: 'time' })
@@ -85,13 +85,13 @@ export class CarLending {
   @Column({ type: 'text', nullable: true })
   cancellationReason?: string;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   confirmedAt?: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   cancelledAt?: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   completedAt?: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
