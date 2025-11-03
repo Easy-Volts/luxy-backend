@@ -44,16 +44,7 @@ export class AuthServiceImpl implements AuthService {
   }
 
   async createAccount(dto: CreateAccountDto): Promise<ApiResponses<any>> {
-    const {
-      email,
-      password,
-      fullName,
-      phone,
-      city = '',
-      state = '',
-      country = '',
-      userType = '',
-    } = dto;
+    const { email, password, fullName, phone, userType = '' } = dto;
 
     this.logger.log(`Creating account for account: ${JSON.stringify(dto)}`);
 
@@ -71,9 +62,6 @@ export class AuthServiceImpl implements AuthService {
     user.lastName = lastName ?? '';
     user.phone = phone;
     user.password = hashedPassword;
-    user.city = city ?? '';
-    user.state = state ?? '';
-    user.country = country ?? '';
     user.userType = userType ? userType : UserType.CUSTOMER;
 
     const savedUser = await this.userRepository.saveUser(user);
@@ -226,5 +214,5 @@ export class AuthServiceImpl implements AuthService {
     await this.rabbitMQ.sendMessageOTP(payload);
   }
 
-// ...existing code...
+  // ...existing code...
 }

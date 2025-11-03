@@ -62,6 +62,4 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<ApiResponses<any>> {
     return this.authService.loginUser(loginDto);
   }
-
-// ...existing code...
 }

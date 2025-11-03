@@ -15,15 +15,6 @@ export class CreateAccountDto {
   @IsOptional()
   @IsEnum(UserType)
   userType?: UserType = UserType.CUSTOMER;
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  location?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  state?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -34,16 +25,6 @@ export class CreateAccountDto {
   @IsString()
   @IsNotEmpty()
   fullName?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  city?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  country?: string;
 
   @ApiProperty()
   @IsNotEmpty()

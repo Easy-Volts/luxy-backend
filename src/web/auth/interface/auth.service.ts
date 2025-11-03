@@ -10,5 +10,4 @@ export interface AuthService {
   resendOTP(data: ResendOTPDto): Promise<ApiResponses<any>>;
   verifyOTP(data: VerifyOTPDto): Promise<ApiResponses<any>>;
   loginUser(loginDto: LoginDto): Promise<ApiResponses<any>>;
-// ...existing code...
 }
