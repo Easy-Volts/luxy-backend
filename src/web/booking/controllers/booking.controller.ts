@@ -1,5 +1,20 @@
-import { Controller, Post, Get, Body, Inject, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Inject,
+  UseGuards,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { BOOKING_SERVICE, BookingService } from '../interface/booking.service';
 import { CreateBookingDto, BookingResponseDto } from 'src/dtos/booking.dto';
 import { AuthGuard } from 'src/commons/security/guard';
@@ -40,10 +55,27 @@ export class BookingController {
 
   @Get()
   @Roles(UserType.CUSTOMER, UserType.ADMIN)
-  @ApiOperation({ summary: 'Get list of bookings with pagination and status filter' })
-  @ApiQuery({ name: 'status', required: false, description: 'Filter by booking status (PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED, REJECTED)' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page', example: 10 })
+  @ApiOperation({
+    summary: 'Get list of bookings with pagination and status filter',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description:
+      'Filter by booking status (PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED, REJECTED)',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of items per page',
+    example: 10,
+  })
   @ApiResponse({
     status: 200,
     description: 'Bookings retrieved successfully',
@@ -53,12 +85,12 @@ export class BookingController {
     @CurrentUser() currentUser: UserDetails,
     @Query('status') status?: string,
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
   ): Promise<ApiResponses<BookingResponseDto[]>> {
     return this.bookingService.getCustomerBookings(currentUser, {
       status,
       page,
-      limit
+      limit,
     });
   }
 }

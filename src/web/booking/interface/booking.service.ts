@@ -12,7 +12,7 @@ export interface BookingService {
 
   getCustomerBookings(
     user: UserDetails,
-    options?: { status?: string; page?: number; limit?: number }
+    options?: { status?: string; page?: number; limit?: number },
   ): Promise<ApiResponses<BookingResponseDto[]>>;
 
   getAllBookings(): Promise<ApiResponses<BookingResponseDto[]>>;

@@ -106,7 +106,7 @@ export class ListenerServiceImpl {
                 while (!isUnique) {
                   accountNumber = Math.floor(
                     1000000000 + Math.random() * 9000000000,
-                  ).toString(); // 10-digit number
+                  ).toString();
                   const existingWallet =
                     await this.walletRepository.findByWalletAccount(
                       accountNumber,

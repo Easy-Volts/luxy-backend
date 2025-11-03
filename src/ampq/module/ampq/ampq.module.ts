@@ -13,9 +13,6 @@ import { RabbitMQListenerService } from 'src/ampq/rabbitmq-listener.service';
 
   providers: [
     ListenerServiceImpl,
-
-    RabbitMQService,
-
     CustomLogger,
     WalletRepository,
     RabbitMQService,
