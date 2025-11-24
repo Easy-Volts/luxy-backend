@@ -15,6 +15,8 @@ import { AuthGuard } from 'src/commons/security/guard';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { BookingResponseDto } from 'src/dtos/booking.dto';
 import { ReviewResponseDto, ReviewStatsDto } from 'src/dtos/review.dto';
+import { DriverDetailsResponseDto } from 'src/dtos/driver.details.dto';
+import { DriverQueryDto } from 'src/dtos/driver.query.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { UserType } from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
@@ -30,6 +32,96 @@ export class DriverController {
     @Inject(DRIVER_SERVICE)
     private readonly driverService: DriverService,
   ) {}
+
+  @Get()
+  @Roles(UserType.ADMIN)
+  @ApiOperation({
+    summary: 'Get all drivers with pagination and filtering (Admin only)',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of items per page',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filter by driver status (ACTIVE, INACTIVE, SUSPENDED)',
+    example: 'ACTIVE',
+  })
+  @ApiQuery({
+    name: 'kycVerified',
+    required: false,
+    description: 'Filter by KYC verification status',
+    example: true,
+  })
+  @ApiQuery({
+    name: 'city',
+    required: false,
+    description: 'Filter by city',
+    example: 'Lagos',
+  })
+  @ApiQuery({
+    name: 'country',
+    required: false,
+    description: 'Filter by country',
+    example: 'Nigeria',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by name or email',
+    example: 'Jenny',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: 'Sort field (name, dateCreated, rating)',
+    example: 'dateCreated',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: 'Sort order (ASC, DESC)',
+    example: 'DESC',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Drivers retrieved successfully with pagination',
+    type: [DriverDetailsResponseDto],
+  })
+  async getAllDrivers(
+    @Query() queryDto: DriverQueryDto,
+  ): Promise<ApiResponses<DriverDetailsResponseDto[]>> {
+    return this.driverService.getAllDrivers(queryDto);
+  }
+
+  @Get('profile')
+  @Roles(UserType.DRIVER, UserType.ADMIN)
+  @ApiOperation({
+    summary: 'Get driver profile details including stats, contact info, and car details',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver details retrieved successfully',
+    type: DriverDetailsResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Driver profile not found',
+  })
+  async getDriverDetails(
+    @CurrentUser() currentUser: UserDetails,
+  ): Promise<ApiResponses<DriverDetailsResponseDto>> {
+    return this.driverService.getDriverDetails(currentUser);
+  }
 
   @Get('bookings')
   @Roles(UserType.DRIVER, UserType.ADMIN)
