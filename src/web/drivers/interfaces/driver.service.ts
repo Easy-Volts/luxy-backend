@@ -1,11 +1,21 @@
 import { ApiResponses } from 'src/dtos/response';
 import { BookingResponseDto } from 'src/dtos/booking.dto';
 import { ReviewResponseDto, ReviewStatsDto } from 'src/dtos/review.dto';
+import { DriverDetailsResponseDto } from 'src/dtos/driver.details.dto';
+import { DriverQueryDto } from 'src/dtos/driver.query.dto';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 export const DRIVER_SERVICE = Symbol('DRIVER_SERVICE');
 
 export interface DriverService {
+  getDriverDetails(
+    user: UserDetails,
+  ): Promise<ApiResponses<DriverDetailsResponseDto>>;
+
+  getAllDrivers(
+    queryDto: DriverQueryDto,
+  ): Promise<ApiResponses<DriverDetailsResponseDto[]>>;
+
   getDriverBookings(
     user: UserDetails,
     options?: { status?: string; page?: number; limit?: number }
