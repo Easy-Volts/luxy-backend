@@ -178,4 +178,25 @@ export class CarLendingRepository {
 
     return this.saveBooking(booking);
   }
+
+  async countByDriverId(driverId: number): Promise<number> {
+    return this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoin('booking.car', 'car')
+      .leftJoin('car.vendor', 'vendor')
+      .where('vendor.userId = :driverId', { driverId })
+      .getCount();
+  }
+
+  async findRecentByDriverId(driverId: number): Promise<CarLending | null> {
+    return this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.car', 'car')
+      .leftJoinAndSelect('car.brand', 'brand')
+      .leftJoinAndSelect('car.vendor', 'vendor')
+      .where('vendor.userId = :driverId', { driverId })
+      .orderBy('booking.createdAt', 'DESC')
+      .limit(1)
+      .getOne();
+  }
 }
