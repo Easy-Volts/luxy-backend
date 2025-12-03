@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Users } from './user.model';
 
 @Entity({ name: 'driver' })
 export class Driver {
@@ -16,4 +17,8 @@ export class Driver {
   kycVerified?: boolean;
   @Column({ type: 'bigint', nullable: true })
   userId?: number;
+
+  @ManyToOne(() => Users)
+  @JoinColumn({ name: 'userId' })
+  user?: Users;
 }
