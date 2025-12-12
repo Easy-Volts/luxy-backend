@@ -3,6 +3,7 @@ import { BookingResponseDto } from 'src/dtos/booking.dto';
 import { ReviewResponseDto, ReviewStatsDto } from 'src/dtos/review.dto';
 import { DriverDetailsResponseDto } from 'src/dtos/driver.details.dto';
 import { DriverQueryDto } from 'src/dtos/driver.query.dto';
+import { UpdateDriverStatusDto, DriverStatusResponseDto } from 'src/dtos/update-driver-status.dto';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 
 export const DRIVER_SERVICE = Symbol('DRIVER_SERVICE');
@@ -28,4 +29,9 @@ export interface DriverService {
   getDriverRatingStats(
     user: UserDetails,
   ): Promise<ApiResponses<ReviewStatsDto>>;
+
+  updateDriverStatus(
+    driverId: number,
+    updateStatusDto: UpdateDriverStatusDto,
+  ): Promise<ApiResponses<DriverStatusResponseDto>>;
 }
