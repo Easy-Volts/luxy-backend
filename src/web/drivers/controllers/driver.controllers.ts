@@ -5,6 +5,9 @@ import {
   ParseIntPipe,
   Query,
   UseGuards,
+  Patch,
+  Param,
+  Body,
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Authenticated } from 'src/commons/decorator/auth.decorator';
@@ -17,6 +20,7 @@ import { BookingResponseDto } from 'src/dtos/booking.dto';
 import { ReviewResponseDto, ReviewStatsDto } from 'src/dtos/review.dto';
 import { DriverDetailsResponseDto } from 'src/dtos/driver.details.dto';
 import { DriverQueryDto } from 'src/dtos/driver.query.dto';
+import { UpdateDriverStatusDto, DriverStatusResponseDto } from 'src/dtos/update-driver-status.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { UserType } from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
@@ -194,5 +198,32 @@ export class DriverController {
     @CurrentUser() currentUser: UserDetails,
   ): Promise<ApiResponses<ReviewStatsDto>> {
     return this.driverService.getDriverRatingStats(currentUser);
+  }
+
+  @Patch(':driverId/status')
+  @Roles(UserType.ADMIN)
+  @ApiOperation({
+    summary: 'Update driver status - Activate, Deactivate, or Suspend (Admin only)',
+    description:
+      'Allows administrators to change a driver\'s status. Use ACTIVE to activate, INACTIVE to deactivate, or SUSPENDED to suspend a driver account.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver status updated successfully',
+    type: DriverStatusResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Driver not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid status value',
+  })
+  async updateDriverStatus(
+    @Param('driverId', ParseIntPipe) driverId: number,
+    @Body() updateStatusDto: UpdateDriverStatusDto,
+  ): Promise<ApiResponses<DriverStatusResponseDto>> {
+    return this.driverService.updateDriverStatus(driverId, updateStatusDto);
   }
 }
