@@ -16,6 +16,7 @@ import {
   DriverContactDto,
 } from 'src/dtos/driver.details.dto';
 import { DriverQueryDto } from 'src/dtos/driver.query.dto';
+import { UpdateDriverStatusDto, DriverStatusResponseDto } from 'src/dtos/update-driver-status.dto';
 import { apiResponse } from 'src/commons/utils/mapper';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 import { CarLending } from 'src/domain/entities/car.lending.model';
@@ -427,5 +428,55 @@ export class DriverServiceImpl implements DriverService {
           }
         : undefined,
     };
+  }
+
+  async updateDriverStatus(
+    driverId: number,
+    updateStatusDto: UpdateDriverStatusDto,
+  ): Promise<ApiResponses<DriverStatusResponseDto>> {
+    this.logger.log(
+      `Updating driver ${driverId} status to ${updateStatusDto.status}`,
+    );
+
+    // Find the driver by ID
+    const driver = await this.driverRepository.findOne({
+      where: { id: driverId },
+      relations: ['user'],
+    });
+
+    if (!driver) {
+      throw new NotFoundException(`Driver with ID ${driverId} not found`);
+    }
+
+    if (!driver.user) {
+      throw new NotFoundException(`User account not found for driver ${driverId}`);
+    }
+
+    // Store previous status
+    const previousStatus = driver.user.status!;
+
+    // Update user status
+    driver.user.status = updateStatusDto.status;
+    await this.userRepository.saveUser(driver.user);
+
+    this.logger.log(
+      `Driver ${driverId} status updated from ${previousStatus} to ${updateStatusDto.status}`,
+    );
+
+    // Build response
+    const response: DriverStatusResponseDto = {
+      driverId: driver.id!,
+      userId: driver.user.id!,
+      name: `${driver.user.firstName || ''} ${driver.user.lastName || ''}`.trim(),
+      status: updateStatusDto.status,
+      previousStatus: previousStatus,
+      reason: updateStatusDto.reason,
+      updatedAt: new Date(),
+    };
+
+    return apiResponse(
+      `Driver status successfully updated to ${updateStatusDto.status}`,
+      response,
+    );
   }
 }

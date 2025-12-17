@@ -18,7 +18,7 @@ dotenv.config();
 export const ormconfig: TypeOrmModuleOptions = {
   type: 'postgres',
   url: process.env.DB_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   synchronize: true,
   entities: [
     Users,
