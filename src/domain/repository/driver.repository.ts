@@ -14,6 +14,13 @@ export class DriverRepository extends Repository<Driver> {
     return this.findOne({ where: { id } });
   }
 
+  async findByUserId(userId: number): Promise<Driver | null> {
+    return this.findOne({
+      where: { userId },
+      relations: ['user'],
+    });
+  }
+
   async saveDriver(driver: Driver): Promise<Driver> {
     return this.save(driver);
   }
