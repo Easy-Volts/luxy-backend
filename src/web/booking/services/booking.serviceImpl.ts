@@ -3,13 +3,20 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { BookingService } from '../interface/booking.service';
 import { CarLendingRepository } from 'src/domain/repository/car.booking.repository';
 import { CarRepository } from 'src/domain/repository/car.repository';
 import { CustomerRepository } from 'src/domain/repository/customer.repository';
+import { DriverRepository } from 'src/domain/repository/driver.repository';
 import { CustomLogger } from 'src/log/logs.service';
-import { CreateBookingDto, BookingResponseDto } from 'src/dtos/booking.dto';
+import {
+  CreateBookingDto,
+  BookingResponseDto,
+  AcceptRideDto,
+  CancelRideDto,
+} from 'src/dtos/booking.dto';
 import { ApiResponses } from 'src/dtos/response';
 import { apiResponse } from 'src/commons/utils/mapper';
 import { CarLending } from 'src/domain/entities/car.lending.model';
@@ -17,6 +24,7 @@ import {
   BookingStatus,
   PaymentMethod,
   PaymentStatus,
+  UserType,
 } from 'src/enums/user.enum';
 import { JwtPayload as UserDetails } from 'src/web/auth/interface/jwt-payload.interface';
 import { PaymentGatewayService } from 'src/payment/services/payment.gateway';
@@ -27,6 +35,7 @@ export class BookingServiceImpl implements BookingService {
     private readonly bookingRepository: CarLendingRepository,
     private readonly carRepository: CarRepository,
     private readonly customerRepository: CustomerRepository,
+    private readonly driverRepository: DriverRepository,
     private readonly paymentService: PaymentGatewayService,
     private readonly logger: CustomLogger,
   ) {
@@ -301,5 +310,175 @@ export class BookingServiceImpl implements BookingService {
       paymentMethod: booking.paymentMethod,
       createdAt: booking.createdAt,
     };
+  }
+
+  async acceptRide(
+    user: UserDetails,
+    dto: AcceptRideDto,
+  ): Promise<ApiResponses<BookingResponseDto>> {
+    this.logger.log(
+      `Driver ${user.username} accepting ride ${dto.bookingReference}`,
+    );
+
+    // Validate driver exists
+    const driver = await this.driverRepository.findByUserId(user.userId);
+    if (!driver) {
+      throw new NotFoundException('Driver not found');
+    }
+
+    // Find booking by reference
+    const booking = await this.bookingRepository.findByReference(
+      dto.bookingReference,
+    );
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    // Verify driver owns the car through vendor relationship
+    if (!booking.car || !booking.car.vendor) {
+      throw new BadRequestException('Car vendor information not found');
+    }
+
+    if (booking.car.vendor.userId !== user.userId) {
+      throw new ForbiddenException(
+        'You are not authorized to accept this booking',
+      );
+    }
+
+    // Check if booking is in PENDING status
+    if (booking.status !== BookingStatus.PENDING) {
+      throw new BadRequestException(
+        `Booking cannot be accepted. Current status: ${booking.status}`,
+      );
+    }
+
+    // Check if payment is completed
+    if (booking.paymentStatus !== PaymentStatus.PAID) {
+      throw new BadRequestException(
+        'Booking can only be accepted after payment is completed',
+      );
+    }
+
+    // Update booking status to CONFIRMED
+    booking.status = BookingStatus.CONFIRMED;
+    booking.confirmedAt = new Date();
+
+    const updatedBooking = await this.bookingRepository.saveBooking(booking);
+
+    this.logger.log(
+      `Booking ${dto.bookingReference} accepted successfully by driver ${user.username}`,
+    );
+
+    return apiResponse(
+      'Ride accepted successfully',
+      this.mapToBookingResponse(updatedBooking),
+    );
+  }
+
+  async cancelRide(
+    user: UserDetails,
+    dto: CancelRideDto,
+  ): Promise<ApiResponses<BookingResponseDto>> {
+    this.logger.log(
+      `User ${user.username} cancelling ride ${dto.bookingReference}`,
+    );
+
+    // Find booking by reference
+    const booking = await this.bookingRepository.findByReference(
+      dto.bookingReference,
+    );
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    // Verify user has permission to cancel
+    let hasPermission = false;
+
+    if (user.role === UserType.CUSTOMER) {
+      const customer = await this.customerRepository.findOneByUserId(
+        user.userId,
+      );
+      if (customer && booking.customerId === customer.id) {
+        hasPermission = true;
+      }
+    } else if (user.role === UserType.DRIVER) {
+      const driver = await this.driverRepository.findByUserId(user.userId);
+      if (
+        driver &&
+        booking.car &&
+        booking.car.vendor &&
+        booking.car.vendor.userId === user.userId
+      ) {
+        hasPermission = true;
+      }
+    } else if (user.role === UserType.ADMIN) {
+      hasPermission = true;
+    }
+
+    if (!hasPermission) {
+      throw new ForbiddenException(
+        'You are not authorized to cancel this booking',
+      );
+    }
+
+    // Check if booking can be cancelled
+    if (
+      booking.status === BookingStatus.CANCELLED ||
+      booking.status === BookingStatus.COMPLETED
+    ) {
+      throw new BadRequestException(
+        `Booking cannot be cancelled. Current status: ${booking.status}`,
+      );
+    }
+
+    // Update booking status to CANCELLED
+    booking.status = BookingStatus.CANCELLED;
+    booking.cancellationReason = dto.cancellationReason;
+    booking.cancelledAt = new Date();
+
+    const updatedBooking = await this.bookingRepository.saveBooking(booking);
+
+    this.logger.log(
+      `Booking ${dto.bookingReference} cancelled successfully by ${user.username}`,
+    );
+
+    return apiResponse(
+      'Ride cancelled successfully',
+      this.mapToBookingResponse(updatedBooking),
+    );
+  }
+
+  async getDriverBookings(
+    user: UserDetails,
+    options?: { status?: string; page?: number; limit?: number },
+  ): Promise<ApiResponses<BookingResponseDto[]>> {
+    this.logger.log(`Fetching bookings for driver ${user.username}`);
+
+    const driver = await this.driverRepository.findByUserId(user.userId);
+    if (!driver) {
+      throw new NotFoundException('Driver not found');
+    }
+
+    const [bookings, total] =
+      await this.bookingRepository.findByDriverIdWithPagination(
+        user.userId,
+        options || {},
+      );
+
+    const responseData = bookings.map((booking) =>
+      this.mapToBookingResponse(booking),
+    );
+
+    const response = apiResponse(
+      'Driver bookings retrieved successfully',
+      responseData,
+    );
+    response.meta = {
+      total,
+      page: options?.page ?? 1,
+      limit: options?.limit ?? 10,
+    };
+
+    return response;
   }
 }
