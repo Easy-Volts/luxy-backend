@@ -4,6 +4,8 @@ import { BOOKING_SERVICE } from '../interface/booking.service';
 import { BookingServiceImpl } from '../services/booking.serviceImpl';
 import { CarLendingRepository } from 'src/domain/repository/car.booking.repository';
 import { CarRepository } from 'src/domain/repository/car.repository';
+import { CustomerRepository } from 'src/domain/repository/customer.repository';
+import { DriverRepository } from 'src/domain/repository/driver.repository';
 import { RolesGuard } from 'src/commons/security/roles.guard';
 import { AuthGuard } from 'src/commons/security/guard';
 import { PaymentModule } from 'src/payment/module/payment.module';
@@ -21,7 +23,8 @@ import { SharedModule } from 'src/shared/shared.module';
     },
     CarLendingRepository,
     CarRepository,
-
+    CustomerRepository,
+    DriverRepository,
     PaymentGatewayService,
     AxiosConfig,
     RolesGuard,
