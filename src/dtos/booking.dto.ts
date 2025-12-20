@@ -61,6 +61,30 @@ export class CreateBookingDto {
   paymentMethod!: PaymentMethod;
 }
 
+export class AcceptRideDto {
+  @ApiProperty({ description: 'Booking ID or Reference' })
+  @IsNotEmpty()
+  @IsString()
+  bookingReference!: string;
+
+  @ApiPropertyOptional({ description: 'Estimated arrival time in minutes' })
+  @IsOptional()
+  @IsNumber()
+  estimatedArrivalTime?: number;
+}
+
+export class CancelRideDto {
+  @ApiProperty({ description: 'Booking ID or Reference' })
+  @IsNotEmpty()
+  @IsString()
+  bookingReference!: string;
+
+  @ApiProperty({ description: 'Reason for cancellation' })
+  @IsNotEmpty()
+  @IsString()
+  cancellationReason!: string;
+}
+
 export class BookingResponseDto {
   paymentInitResponse!: PaymentInitResponse;
   id?: number;
